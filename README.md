@@ -1,2 +1,4 @@
-# installer
-Ragnarok installer infrastructure
+Ragnarok-installer
+==================
+
+The ragnarok installer infrastructure. WIP.
