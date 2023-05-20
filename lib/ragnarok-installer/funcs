@@ -47,11 +47,11 @@ askyn() {
 
 	read -r _resp?"$_q "
 	case "$_resp" in
-		y|yes)	exit 0
+		Y|y|Yes|yes)	exit 0
 				;;
-		n|no)	exit 1
+		N|n|No|no)	exit 1
 				;;
-		*)	echo "Answer y/yes or n/no"
+		*)	echo "Answer Yes/yes/Y/y or No/no/N/n"
 			;;
 	esac
 }

@@ -29,7 +29,7 @@ askconf "Hostname for this machine?" HOSTNAME "$CONF"
 
 # In some cases a user should be able to display a list of available options.
 # Unfortunately, we can't use variables piped through less as it gives very
-# inconsistent (or non-existant) results. So each of them need their own
+# inconsistent (or non-existent) results. So each of them need their own
 # functions.
 ask_tz() {
 	local _resp _q="$1"
@@ -55,7 +55,7 @@ ask_locale() {
 			;;
 	esac
 }
-ask_locale "Enter the locale for this system. e.g. en_US.UTF-8. ('l' for a list of supported locales:"
+ask_locale "Enter the locale for this system. e.g. en_US.UTF-8 ('l' for a list of supported locales):"
 
 ask_kb() {
 	local _resp _q="$1"
@@ -80,7 +80,7 @@ echo
 echo
 # Setup user
 askconf "Name for default user (leave blank to setup user after first boot)" USERNAME "$CONF"
-
+echo
 echo
 # User password
 askpass "Password for the root account (will not echo).
@@ -94,4 +94,4 @@ askconf "Will this system use X11? ('yes' or 'no')?" X11 "$CONF"
 
 echo
 # The base system should be fetched from where
-askconf "Location of the base system? ('disk', 'network' or 'mkchroot')" BASELOC "$CONF"
+askconf "Location of the base system? ('disk', 'network' or 'mkchroot'. 'l' to view list and description)" BASELOC "$CONF"

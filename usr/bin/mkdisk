@@ -28,9 +28,9 @@ do_conf() {
 	lsblk -lp | awk '/disk/ { print $1, "(" $4 ")" }'
 	askconf "On which disk should the system be installed? (e.g. /dev/sdX):" DISK "$CONF"
 	askconf "Will you boot in bios or efi mode (answer 'bios' or 'efi')?:" MODE "$CONF"
-	askconf "Size of swap partition in GB (e.g. 6):" SWAPSIZE "$CONF"
-	askconf "Size of the root partition in GB:" ROOTSIZE "$CONF"
-	askconf "Size of the /var/log partition (leave empty to use the default, which is 3):" LOGSIZE "$CONF"
+	askconf "Size of swap partition (number followed by M or G, e.g. 500M, 1G, etc):" SWAPSIZE "$CONF"
+	askconf "Size of the root partition in GB (number followed by M or G, e.g. 30G):" ROOTSIZE "$CONF"
+	askconf "Size of the /var/log partition (leave empty to use the default, which is 3G):" LOGSIZE "$CONF"
 	askconf "Size of /home (leave empty to use the rest of the available disk space):" HOMESIZE "$CONF"
 }
 
