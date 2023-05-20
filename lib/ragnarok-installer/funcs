@@ -33,6 +33,12 @@ get_val() {
 	grep "${_conf}" "$_file" | cut -d '=' -f2
 }
 
+reset_val() {
+	local _conf="$1" _file="$2"
+
+	sed -i "/$_conf/d" "$_file"
+}
+
 # Ask user a config question and log the answer in the conf file
 askconf() {
 	local _resp _q="$1" _val="$2" _file="$3"
@@ -50,6 +56,8 @@ askyn() {
 		Y|y|Yes|yes)	exit 0
 				;;
 		N|n|No|no)	exit 1
+				;;
+		s|skip)		exit 2
 				;;
 		*)	echo "Answer Yes/yes/Y/y or No/no/N/n"
 			;;
@@ -128,7 +136,7 @@ do_swap() {
 		elif [[ $_mem -le 64500000 ]]; then
 			_swapsiz=8G
 		elif [[ $_mem -le 128500000 ]]; then
-			_swapsiz=11G
+			_swapsiz=12G
 		elif [[ $_mem -le 256500000 ]]; then
 		_swapsiz=16G
 		fi
