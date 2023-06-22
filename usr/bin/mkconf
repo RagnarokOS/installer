@@ -1,6 +1,7 @@
 #!/bin/ksh
 
-# mkconf - create install.conf file for auto-installs.
+# mkconf - create install.conf file for auto-installs. This is not used by the installer
+# itself.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -79,7 +80,7 @@ you'd rather be prompted for a password at install time." ROOTPASS "$CONF"
 echo
 echo
 # Setup user
-askconf "Name for default user (leave blank to setup user after first boot)" USERNAME "$CONF"
+askconf "Name for default user (leave blank to setup user after first boot):" USERNAME "$CONF"
 echo
 echo
 # User password
@@ -90,8 +91,13 @@ you'd rather be prompted for a password at install time." USERPASS "$CONF"
 echo
 echo
 # X or no X
-askconf "Will this system use X11? ('yes' or 'no')?" X11 "$CONF"
+askconf "Will this system use X11? ('yes' or 'no')?:" X11 "$CONF"
 
 echo
-# The base system should be fetched from where
-askconf "Location of the base system? ('disk', 'network' or 'mkchroot'. 'l' to view list and description)" BASELOC "$CONF"
+askconf "Should this system be installed from scratch, or using the sets? ('netinstall' or 'sets'):" SETS "$CONF"
+
+if [[ $(get_val SETS $CONF) == sets ]]; then
+	echo
+	# The sets should be fetched from where
+	askconf "Location of the base system? ('disk' or 'network'. 'l' to view list and description)" BASELOC "$CONF"
+fi

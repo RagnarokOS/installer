@@ -1,0 +1,17 @@
+#!/bin/ksh
+
+. /usr/lib/ragnarok-installer/funcs
+
+# bootstrapping the base system if netinstall was chosen.
+debstrap() {
+	SOURCE_DATE_EPOCH=$(date +%s) /usr/bin/mmdebstrap --variant="minbase" \
+		--components="main non-free-firmware" \
+		--include="$_pkgs" \
+		--hook-directory="/usr/share/ragnarok-installer/hooks" \
+	"$_parent" /mnt
+}
+
+# Main function. 
+main() {
+}
+main 2>&1 | tee install.log
