@@ -96,8 +96,15 @@ askconf "Will this system use X11? ('yes' or 'no')?:" X11 "$CONF"
 echo
 askconf "Should this system be installed from scratch, or using the sets? ('netinstall' or 'sets'):" SETS "$CONF"
 
-if [[ $(get_val SETS $CONF) == sets ]]; then
+if [[ $(get_val SETS "$CONF") == sets ]]; then
 	echo
 	# The sets should be fetched from where
 	askconf "Location of the base system? ('disk' or 'network'. 'l' to view list and description)" BASELOC "$CONF"
+
+	echo
+	if [[ $(get_val BASELOC "$CONF") == disk ]]; then
+		askconf "Enter the disk path where the sets are located ('live' or full path to device, e.g. /dev/sdX1):" SETPATH "$CONF"
+	elif [[ $(get_val BASELOC "$CONF") == net ]]; then
+		askconf "Enter the source to fetch the sets from ('default' or url, e.g. https://example.com/ragnarok-sets):" SETSRC "$CONF"
+	fi
 fi
