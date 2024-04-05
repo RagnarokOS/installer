@@ -1,0 +1,63 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2024.04.05.16.14.51;	author lecorbeau;	state Exp;
+branches;
+next	;
+
+
+desc
+@main installer script
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/bin/ksh
+
+# Main installer script.
+# $Ragnarok$
+
+debstrap() {
+	/usr/bin/mmdebstrap --variant=${VARIANT} \
+		--components="main non-free-firmware" \
+		--include="${BASE_PACKAGES}" \
+		--hook-directory=hooks/ \
+		${FLAVOUR} /mnt \
+		"deb https://ragnarokos.github.io/base/deb/ current main" \
+		"deb https://ragnarokos.github.io/xserv/deb/ current main" \
+		"deb http://deb.debian.org/debian/ bookworm main non-free-firmware" \
+		"deb http://security.debian.org/ bookworm-security main non-free-firmware" \
+		"deb http://deb.debian.org/debian/ bookworm-updates main non-free-firmware"
+}
+
+finish() {
+	local _resp
+
+	read -r _resp?"Installation complete. Type r (to reboot) or e (to exit and stay in the live session) then Return. "
+
+	case "$_resp" in
+		r)	loginctl reboot
+			;;
+		e)	exit 0
+			;;
+		*)	loginctl reboot
+			;;
+	esac
+}
+
+main() {
+	debstrap
+	finish
+}
+
+main 2>&1 | tee install.log
+@

@@ -1,7 +1,0 @@
-disk		use the tarball provided by the iso in /usr/src/.
-
-http		fetch the tarball from the web.
-
-chroot		instead of using a tarball, use mkchroot(1) to
-		create the base system from scratch.
-
