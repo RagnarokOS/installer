@@ -1,5 +1,8 @@
 #!/bin/ksh
 
+# Initial system config.
+# $Ragnarok: customize01.sh,v 1.1 2024/04/05 16:26:28 lecorbeau Exp $
+
 set -e
 
 # This is shorter than constantly writing the printf command
