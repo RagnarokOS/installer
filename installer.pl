@@ -31,9 +31,21 @@ sub error {
 	die("$err\n");
 }
 
-# Print message
+# Print message (just makes the code more readable, again).
 sub msg {
+	my $msg = shift;
+	print("$msg\n");
+}
 
+# Ask a question. NOTE This is going to be useful down the line.
+sub ask {
+	my ($question)	= @_;
+	local $!	= 1;
+
+	print("$question\n");
+	chomp(my $answer = <STDIN>);
+
+	return $answer;
 }
 
 ## Actual installer
