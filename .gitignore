@@ -1,1 +1,3 @@
 RCS/
+# Ignore usr dir for now
+usr/*
