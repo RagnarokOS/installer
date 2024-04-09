@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.3 2024/04/09 17:54:49 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.4 2024/04/09 17:58:50 lecorbeau Exp $
 
 set -e
 
@@ -127,7 +127,7 @@ To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xs
 
 	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
 	for _set in "${_sets[@]}"; do
-		/usr/bin/apt-get install "$_set"
+		chroot "$1" /usr/bin/apt-get install "$_set"
 	done
 }
 
