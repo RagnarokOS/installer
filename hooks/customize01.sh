@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.1 2024/04/05 16:26:28 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.2 2024/04/09 15:51:35 lecorbeau Exp $
 
 set -e
 
@@ -101,6 +101,34 @@ set_user() {
 
 	msg "Password for $_resp (will not echo)"
 	/usr/sbin/chroot passwd "$_resp"
+}
+
+# Let user decide which set(s) to install.
+# NOTE: This will need to be tested on its own first.
+install_sets() {
+	local _resp _sets
+
+	read -r _resp?"The following sets will be installed:
+[x] base
+[x] xfonts
+[x] xprogs
+[x] xserv
+
+To omit one or more set, simply type -<setname> (e.g. -xfonts, or -xfonts -xprogs -xserv). Then press Return to install the sets: "
+
+	# If no set was deselected, proceed, else remove deselected first.
+	if [[ -z $_resp ]]; then
+		msg "Installing all sets"
+	else
+		for _set in "$_resp"; do
+			sed -i -e "s/ $_set//g" install.conf
+		done
+	fi
+
+	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
+	for _set in "${_sets[@]}"; do
+		/usr/bin/apt-get install "$_set"
+	done
 }
 
 # Setup grub
