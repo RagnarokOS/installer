@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.2 2024/04/09 15:51:35 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.3 2024/04/09 17:54:49 lecorbeau Exp $
 
 set -e
 
@@ -114,7 +114,7 @@ install_sets() {
 [x] xprogs
 [x] xserv
 
-To omit one or more set, simply type -<setname> (e.g. -xfonts, or -xfonts -xprogs -xserv). Then press Return to install the sets: "
+To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xserv). Then press Return to install the sets: "
 
 	# If no set was deselected, proceed, else remove deselected first.
 	if [[ -z $_resp ]]; then
