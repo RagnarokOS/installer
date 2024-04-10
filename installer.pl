@@ -59,7 +59,31 @@ sub debstrap {
 		"deb http://deb.debian.org/debian/ ${flavour} main non-free-firmware",
 		"deb http://security.debian.org/ ${flavour}-security main non-free-firmware",
 		"deb http://deb.debian.org/debian/ ${flavour}-updates main non-free-firmware") == 0
-			or error("mmdebstrap failed, $!");
+			or error("mmdebstrap failed, $!\n");
+}
+
+# Finishing up.
+sub finish {
+	print("Installation complete. Type 'r' to reboot to the new system, or 'e' to exit the installer and stay in the live session: ");
+	chomp(my $choice = <STDIN>);
+
+	for ($choice) {
+		if($choice eq 'e') {
+			print("rebooting in 5 seconds...\n");
+			sleep(5);
+			system("/usr/bin/loginctl", "reboot") == 0
+				or error("Can't reboot, $!\n");
+		}
+		if ($choice eq 'r') {
+			print("Exiting installer...\n")
+			exit(0);
+		}
+		else {
+			print("Wrong answer. Type 'r' to reboot, or 'e' to exit installer... ");
+			goto &finish;
+		}
+	}
+	return $choice;
 }
 
 ## Actual installer
