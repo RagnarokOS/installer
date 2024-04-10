@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.5 2024/04/10 13:09:45 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.6 2024/04/10 17:35:04 lecorbeau Exp $
 
 set -e
 
@@ -129,6 +129,12 @@ To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xs
 	for _set in "${_sets[@]}"; do
 		chroot "$1" /usr/bin/apt-get install "$_set"
 	done
+}
+
+# Enable the wheel group.
+setup_wheel() {
+	sed -i '15 s/^# //' /etc/pam.d/su
+	addgroup --system wheel
 }
 
 # Setup grub
