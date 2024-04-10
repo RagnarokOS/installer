@@ -1,9 +1,10 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.2 2024/04/09 15:11:11 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.3 2024/04/10 13:16:02 lecorbeau Exp $
 
 # Parse config values
+CODENAME=$(awk '/Codename/ { print $3 }' install.conf)
 FLAVOUR=$(awk '/Flavour/ { print $3 }' install.conf)
 VARIANT=$(awk '/Variant/ { print $3 }' install.conf)
 COMPONENTS=$(awk '/Components/ { print $3 }' install.conf)
@@ -14,11 +15,11 @@ debstrap() {
 		--components="${COMPONENTS}" \
 		--hook-directory=hooks/ \
 		"${FLAVOUR}" /mnt \
-		"deb https://ragnarokos.github.io/base/deb/ current main" \
-		"deb https://ragnarokos.github.io/xserv/deb/ current main" \
-		"deb http://deb.debian.org/debian/ bookworm main non-free-firmware" \
-		"deb http://security.debian.org/ bookworm-security main non-free-firmware" \
-		"deb http://deb.debian.org/debian/ bookworm-updates main non-free-firmware"
+		"deb https://ragnarokos.github.io/base/deb/ ${CODENAME} main" \
+		"deb https://ragnarokos.github.io/xserv/deb/ ${CODENAME} main" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
+		"deb http://security.debian.org/ ${FLAVOUR}-security main non-free-firmware" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR}-updates main non-free-firmware"
 }
 
 finish() {
