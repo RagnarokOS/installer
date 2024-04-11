@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.10 2024/04/11 16:01:59 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.11 2024/04/11 16:20:43 lecorbeau Exp $
 
 set -e
 
@@ -15,7 +15,7 @@ msg() {
 # Set up fstab
 gfstab() {
 	msg "Generating fstab entries..."
-	genfstab -U /mnt >> /etc/mnt/fstab
+	genfstab -U /mnt >> /mnt/etc/fstab
 }
 
 # Copy network files
