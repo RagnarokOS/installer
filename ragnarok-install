@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.3 2024/04/10 13:16:02 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.4 2024/04/11 15:39:50 lecorbeau Exp $
 
 # Parse config values
 CODENAME=$(awk '/Codename/ { print $3 }' install.conf)
@@ -13,7 +13,7 @@ COMPONENTS=$(awk '/Components/ { print $3 }' install.conf)
 debstrap() {
 	/usr/bin/mmdebstrap --variant="${VARIANT}" \
 		--components="${COMPONENTS}" \
-		--hook-directory=hooks/ \
+		--hook-directory=/usr/libexec/ragnarok-installer/hooks/ \
 		"${FLAVOUR}" /mnt \
 		"deb https://ragnarokos.github.io/base/deb/ ${CODENAME} main" \
 		"deb https://ragnarokos.github.io/xserv/deb/ ${CODENAME} main" \
