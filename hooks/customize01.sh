@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.8 2024/04/11 14:38:41 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.9 2024/04/11 14:55:14 lecorbeau Exp $
 
 set -e
 
@@ -109,11 +109,11 @@ install_sets() {
 	local _resp _sets
 
 	read -r _resp?"The following sets will be installed:
-[x] base
-[x] devel
-[x] xfonts
-[x] xprogs
-[x] xserv
+[x] base    | The base system.
+[x] devel   | The git, build-essential and LLVM/Clang toolchain.
+[x] xfonts  | Extra fonts for xserv.
+[x] xprogs  | Window Managers (Raven, cwm) + ragnarok-terminal and dmenu.
+[x] xserv   | Minimal xorg + xinit.
 
 To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xserv). Then press Return to install the sets: "
 
