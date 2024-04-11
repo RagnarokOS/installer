@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.6 2024/04/10 17:35:04 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.7 2024/04/11 14:04:08 lecorbeau Exp $
 
 set -e
 
@@ -157,3 +157,19 @@ set_grub() {
 	fi
 	chroot "$1" update-grub
 }
+
+# Main 
+main() {
+	gfstab
+	set_net
+	set_tz
+	set_hosts
+	set_lokb
+	set_rootpass
+	set_user
+	setup_wheel
+	inst_kern
+	install_sets
+	set_grub
+}
+main
