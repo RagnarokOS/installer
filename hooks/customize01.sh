@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.7 2024/04/11 14:04:08 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.8 2024/04/11 14:38:41 lecorbeau Exp $
 
 set -e
 
@@ -110,6 +110,7 @@ install_sets() {
 
 	read -r _resp?"The following sets will be installed:
 [x] base
+[x] devel
 [x] xfonts
 [x] xprogs
 [x] xserv
