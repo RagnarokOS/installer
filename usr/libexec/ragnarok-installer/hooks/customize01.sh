@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.9 2024/04/11 14:55:14 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.10 2024/04/11 16:01:59 lecorbeau Exp $
 
 set -e
 
@@ -119,12 +119,17 @@ To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xs
 
 	# If no set was deselected, proceed, else remove deselected first.
 	if [[ -z $_resp ]]; then
-		msg "Installing all sets"
-	else
-		for _set in $_resp; do
-			sed -i -e "s/ $_set//g" install.conf
-		done
+		_resp="all"
 	fi
+
+	case "$_resp" in
+		all)	msg "Installing all sets."
+			;;
+		*)	for _set in $_resp; do
+				sed -i -e "s/ $_set//g" install.conf
+			done
+			;;
+	esac
 
 	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
 	for _set in "${_sets[@]}"; do
