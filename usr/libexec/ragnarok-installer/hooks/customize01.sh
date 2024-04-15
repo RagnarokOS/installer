@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Initial system config.
-# $Ragnarok: customize01.sh,v 1.11 2024/04/11 16:20:43 lecorbeau Exp $
+# $Ragnarok: customize01.sh,v 1.12 2024/04/15 15:13:06 lecorbeau Exp $
 
 set -e
 
@@ -23,36 +23,6 @@ set_net() {
 	msg "Setting up network interfaces"
 	/usr/bin/cp /etc/network/interfaces "$1"/etc/network/
 	/usr/bin/cp -r /etc/network/interfaces.d/ "$1"/etc/network/
-}
-
-# Ask user which kernel to install.
-# Should this be done here? Might be better to let users decide after system installation.
-inst_kern() {
-	local _resp
-
-	read -r _resp?"Ragnarok provides an experimental kernel built with LLVM/Clang, which has many security options built-in (such as Control Flow Integrity) and makes
-use of Clang's ThinLTO feature. Although no critical bug has been found, this kernel has not been tested on enough hardware which means there may be unknown bugs. You can
-choose between installing this kernel alone (not recommended), installing only the standard Debian kernel, or both (with the Ragnarok kernel as default). Do note that the
-Ragnarok kernel does not support secure boot, and you will need to use the kernupd(8) command to update.
-
-1) Install both (default).
-2) Install only the Ragnarok kernel.
-3) Install only Debian's kernel.
-
-Choice? "
-
-	case "$_resp" in
-		1)	chroot "$1" kernupd
-			chroot "$1" apt-get install linux-image-amd64
-			;;
-		2)	chroot "$1" kernupd
-			;;
-		3)	chroot "$1" apt-get install linux-image-amd64
-			;;
-		*)	chroot "$1" kernupd
-			chroot "$1" apt-get install linux-image-amd64
-			;;
-	esac
 }
 
 # Setting the timezone
@@ -102,6 +72,38 @@ set_user() {
 	msg "Password for $_resp (will not echo)"
 	/usr/sbin/chroot passwd "$_resp"
 }
+
+# Ask user which kernel to install.
+# Should this be done here? Might be better to let users decide after system installation.
+inst_kern() {
+	local _resp
+
+	read -r _resp?"Ragnarok provides an experimental kernel built with LLVM/Clang, which has many security options built-in (such as Control Flow Integrity) and makes
+use of Clang's ThinLTO feature. Although no critical bug has been found, this kernel has not been tested on enough hardware which means there may be unknown bugs. You can
+choose between installing this kernel alone (not recommended), installing only the standard Debian kernel, or both (with the Ragnarok kernel as default). Do note that the
+Ragnarok kernel does not support secure boot, and you will need to use the kernupd(8) command to update.
+
+1) Install both (default).
+2) Install only the Ragnarok kernel.
+3) Install only Debian's kernel.
+
+Choice? "
+
+	case "$_resp" in
+		1)	chroot "$1" kernupd
+			chroot "$1" apt-get install linux-image-amd64
+			;;
+		2)	chroot "$1" kernupd
+			;;
+		3)	chroot "$1" apt-get install linux-image-amd64
+			;;
+		*)	chroot "$1" kernupd
+			chroot "$1" apt-get install linux-image-amd64
+			;;
+	esac
+}
+
+
 
 # Let user decide which set(s) to install.
 # NOTE: This will need to be tested on its own first.
