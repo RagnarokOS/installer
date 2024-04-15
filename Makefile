@@ -1,13 +1,17 @@
 # Makefile for the installer
-# $Ragnarok: Makefile,v 1.1 2024/04/15 15:27:58 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.2 2024/04/15 16:41:07 lecorbeau Exp $
 
-install:
+PKG	= ragnarok-installer
+
+dirs:
 	mkdir -p ${DESTDIR}/usr/bin
-	mkdir -p ${DESTDIR}/etc/ragnarok-installer
+	mkdir -p ${DESTDIR}/etc/
 	mkdir -p ${DESTDIR}/usr/libexec
-	cp ragnarok-install ${DESTDIR}/usr/bin/
-	cp install.conf ${DESTDIR}/etc/ragnarok-installer/
-	cp -r usr/libexec/ragnarok-installer ${DESTDIR}/libexec/
-	# remove .gitignore. Won't be necessary once the Makefile is
-	# done properly.
-	rm ${DESTDIR}/usr/libexec/ragnarok-installer/.gitignore
+
+install: dirs
+	cp ${PKG} ${DESTDIR}/usr/bin/
+	cp install.conf ${DESTDIR}/etc/
+	cp -r usr/libexec/${PKG} ${DESTDIR}/libexec/
+
+deb: install
+	/usr/bin/equivs-build ${PKG}.pkg 2>&1 | tee ${PKG}.build
