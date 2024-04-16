@@ -1,0 +1,23 @@
+[2024-04-16]
+
+I'm an idiot. It's been a while since I used mmdebstrap to create something
+other than a tarball and forgot that it won't work on directories that are
+already populated. Obviously, this causes an issue with creating and mounting
+partitions before the system is installed (and any system booting in EFI mode
+requires a boot partition to be mounted to the /mnt/boot/efi directory at
+install time).
+
+I wanted to take advantage of mmdebstrap's hooks for the installer, but since
+it won't work I'll go back to my original idea of creating a small rootfs (with
+mmdebstrap) that would get extracted at install time, rather than using the
+tool directly.
+
+This was a smarter plan, as it would make the install process faster, and
+put less strain on the repos' monthly download limits. My concern lies
+solely with proper permissions once the tarball is extracted. Using the
+right tar arguments will avoid any issues, but I'm paranoid so there
+you go.
+
+This paranoia will be moot once the 'security-check' cron job is created, as
+it will check for proper file permissions and fix any problem in that regard,
+among other things.

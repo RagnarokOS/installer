@@ -2,6 +2,7 @@ Ragnarok-installer
 ==================
 
 The ragnarok installer infrastructure. WIP.
+For development notes, see `notes.txt` in this repository.
 
 ### installer.pl
 
