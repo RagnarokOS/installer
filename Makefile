@@ -1,7 +1,9 @@
 # Create the rootfs tarball
-# $Ragnarok: Makefile,v 1.2 2024/04/17 15:02:36 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.3 2024/04/17 15:52:15 lecorbeau Exp $
 
 include config.mk
+
+all: miniroot installer
 
 miniroot:
 	/usr/bin/mmdebstrap --variant="${VARIANT}" \
@@ -13,3 +15,8 @@ miniroot:
 		"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
 		"deb http://security.debian.org/ ${FLAVOUR}-security main non-free-firmware" \
 		"deb http://deb.debian.org/debian/ ${FLAVOUR}-updates main non-free-firmware"
+
+# Create the installer pkg
+installer:
+	cd installer; \
+		equivs-build ragnarok-installer.pkg 2>&1 | tee ragnarok-installer.build
