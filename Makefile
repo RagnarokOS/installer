@@ -1,11 +1,12 @@
 # Create the rootfs tarball
-# $Ragnarok: Makefile,v 1.1 2024/04/17 14:50:54 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.2 2024/04/17 15:02:36 lecorbeau Exp $
 
 include config.mk
 
 miniroot:
 	/usr/bin/mmdebstrap --variant="${VARIANT}" \
 		--components="${COMPONENTS}" \
+		--include="${PACKAGES}" \
 		--hook-directory=hooks/ \
 		"${FLAVOUR}" miniroot${VERSION}.tgz \
 		"deb https://ragnarokos.github.io/base/deb/ ${CODENAME} main" \
