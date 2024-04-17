@@ -1,7 +1,11 @@
 Ragnarok-installer
 ==================
 
-The ragnarok installer infrastructure. WIP.
+**Work in progress**
+
+This repository contains the Makefile to create the rootfs used by the
+installer, as well as the installer itself.
+
 For development notes, see `notes.txt` in this repository.
 
 ### installer.pl
