@@ -1,20 +1,14 @@
-# Makefile for the installer
-# $Ragnarok: Makefile,v 1.3 2024/04/16 15:12:39 lecorbeau Exp $
+# Create the rootfs tarball
+# $Ragnarok: Makefile,v 1.1 2024/04/17 14:50:54 lecorbeau Exp $
 
-PKG	= ragnarok-installer
+include config.mk
 
-dirs:
-	mkdir -p ${DESTDIR}/usr/bin
-	mkdir -p ${DESTDIR}/etc/
-	mkdir -p ${DESTDIR}/usr/libexec
-
-install: dirs
-	cp ${PKG} ${DESTDIR}/usr/bin/
-	cp install.conf ${DESTDIR}/etc/
-	cp -r usr/libexec/${PKG} ${DESTDIR}/libexec/
-	chmod 755 ${DESTDIR}/usr/bin/ragnarok-install
-	cd ${DESTDIR}/libexec/ragnarok-installer/hooks/; \
-		chmod 755 customize01.sh customize02.sh setup01.sh
-
-deb: install
-	/usr/bin/equivs-build ${PKG}.pkg 2>&1 | tee ${PKG}.build
+miniroot:
+	/usr/bin/mmdebstrap --variant="${VARIANT}" \
+		--components="${COMPONENTS}" \
+		--hook-directory=hooks/ \
+		"${FLAVOUR}" miniroot${VERSION}.tgz \
+		"deb https://ragnarokos.github.io/base/deb/ ${CODENAME} main" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
+		"deb http://security.debian.org/ ${FLAVOUR}-security main non-free-firmware" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR}-updates main non-free-firmware"
