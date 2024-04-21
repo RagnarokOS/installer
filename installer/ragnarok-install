@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.8 2024/04/21 16:01:06 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.9 2024/04/21 17:42:57 lecorbeau Exp $
 
 set -e
 
@@ -67,16 +67,16 @@ gfstab() {
 set_net() {
 	msg "Setting up network interfaces"
 	# Copy /etc/resolv.conf to the chroot, temporarily
-	/usr/bin/cp /etc/resolv.conf "$1"/etc/resolv.conf
+	/usr/bin/cp /etc/resolv.conf /mnt/etc/resolv.conf
 
 	# copy interfaces files.
-	/usr/bin/cp /etc/network/interfaces "$1"/etc/network/
-	/usr/bin/cp -r /etc/network/interfaces.d/ "$1"/etc/network/
+	/usr/bin/cp /etc/network/interfaces /mnt/etc/network/
+	/usr/bin/cp -r /etc/network/interfaces.d/ /mnt/etc/network/
 }
 
 # Setting the timezone
 set_tz() {
-	/usr/sbin/chroot "$1" dpkg-reconfigure tzdata
+	 arch-chroot /mnt dpkg-reconfigure tzdata
 }
 
 # Setup /etc/hosts and /etc/hostname
@@ -84,7 +84,7 @@ set_hosts() {
 	local _resp
 
 	read -r _resp?"Enter the hostname of the machine: "
-	msg "$_resp" > "$1"/etc/hostname
+	msg "$_resp" > /mnt/etc/hostname
 	msg "127.0.0.1   localhost
 127.0.1.1   $_resp
 
@@ -92,21 +92,21 @@ set_hosts() {
 # IPv6
 ::1         localhost ip6-localhost ip6-loopback
 ff02::1     ip6-allnodes
-ff02::2     ip6-allrouters" > "$1"/etc/hosts
+ff02::2     ip6-allrouters" > /mnt/etc/hosts
 }
 
 # Set locales and keyboard config
 set_lokb() {
 	msg "Setting up locales and keyboard config..."
-	/usr/sbin/chroot "$1" apt-get install locales -y
-	/usr/sbin/chroot "$1" dpkg-reconfigure locales
-	/usr/sbin/chroot "$1" apt-get install console-setup -y
+	arch-chroot /mnt apt-get install locales -y
+	arch-chroot /mnt dpkg-reconfigure locales
+	arch-chroot /mnt apt-get install console-setup -y
 }
 
 # Set root password
 set_rootpass() {
 	msg "Password for the root account (will not echo)"
-	/usr/sbin/chroot "$1" passwd
+	arch-chroot /mnt passwd
 }
 
 # Setup a default user name and password
@@ -114,18 +114,18 @@ set_user() {
 	local _resp
 
 	read -r _resp?"Name of default user: "
-	/usr/sbin/chroot "$1" useradd -m "$_resp"
-	/usr/sbin/chroot "$1" usermod -aG wheel,cdrom,floppy,audio,dip,video,plugdev,netdev "$_resp"
-	/usr/sbin/chroot "$1" usermod -s /bin/ksh "$_resp"
+	arch-chroot /mnt useradd -m "$_resp"
+	arch-chroot /mnt usermod -aG wheel,cdrom,floppy,audio,dip,video,plugdev,netdev "$_resp"
+	arch-chroot /mnt usermod -s /bin/ksh "$_resp"
 
 	msg "Password for $_resp (will not echo)"
-	/usr/sbin/chroot passwd "$_resp"
+	arch-chroot /mnt/ passwd "$_resp"
 }
 
 inst_kern() {
 	# First, install Debian's standard kernel as a back up.
-	chroot "$1" apt-get install linux-image-amd64
-	chroot "$1" kernupd
+	arch-chroot /mnt/ apt-get install linux-image-amd64
+	arch-chroot /mnt/ kernupd
 }
 
 # Let user decide which set(s) to install.
@@ -158,7 +158,7 @@ To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xs
 
 	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
 	for _set in "${_sets[@]}"; do
-		chroot "$1" /usr/bin/apt-get install "$_set"
+		arch-chroot /mnt/ /usr/bin/apt-get install "$_set"
 	done
 }
 
@@ -169,18 +169,18 @@ set_grub() {
 	msg "Installing grub..."
 	if [ -d "$1"/boot/efi ]; then
 		# Install grub-efi
-		chroot "$1" apt-get install grub-efi-amd64
-		chroot "$1" grub-install --target=x86_64-efi \
+		arch-hroot /mnt/ apt-get install grub-efi-amd64
+		arch-chroot /mnt/ grub-install --target=x86_64-efi \
 			--efi-directory=/boot/efi
 	else
 		# Install grub-pc
-		chroot "$1" apt-get install grub
+		arch-chroot /mnt/ apt-get install grub
 		msg "Listing available devices..."
-		chroot "$1" lsblk
+		arch-chroot /mnt/ lsblk
 		read -r _resp?"Which device should the bootloader be installed on? (e.g. /dev/sdX) "
-		chroot "$1" grub-install "$_resp"
+		arch-chroot /mnt/ grub-install "$_resp"
 	fi
-	chroot "$1" update-grub
+	arch-chroot /mnt/ update-grub
 }
 
 # Cleanup.
