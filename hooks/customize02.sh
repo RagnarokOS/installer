@@ -3,9 +3,16 @@
 set -e
 
 # Clean up the chroot
-# $Ragnarok: customize02.sh,v 1.2 2024/04/05 16:28:34 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.3 2024/04/21 15:44:36 lecorbeau Exp $
 
 printf '%s\n' "Cleaning up the chroot..."
+
+# Using the repo with mmdebstrap will set it up in the chroot's /etc/apt/sources.list
+# file, but it's already copied to its own file in /etc/apt/sources.list.d/, so remove
+# the duplicate
+sed -i '/ragnarokos/d' "$1"/etc/apt/sources.list
+
+# Do the cleanup
 chroot "$1" apt clean
 rm -rf "$1"/var/lib/apt/lists/*
 rm "$1"/var/log/apt/eipp.log.xz
