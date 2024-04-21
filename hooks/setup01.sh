@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # Customize before the setup phase
-# $Ragnarok: setup01.sh,v 1.2 2024/04/11 14:34:21 lecorbeau Exp $
+# $Ragnarok: setup01.sh,v 1.3 2024/04/21 15:22:56 lecorbeau Exp $
 
 set -e
 
 # Copy apt sources and keys to the chroot
 mkdir -p "$1"/etc/apt
-cp -r ../src/etc/apt/sources.list.d "$1"/etc/apt/
-cp -r ../src/etc/apt/trusted.gpg.d/ "$1"/etc/apt/
+cp -r ../src/ragnarok-base/etc/apt/sources.list.d "$1"/etc/apt/
+cp -r ../src/ragnarok-base/etc/apt/trusted.gpg.d/ "$1"/etc/apt/
 
 # Set the default debconf frontend to Readline
 chroot "$1" echo 'debconf debconf/frontend select Readline' | debconf-set-selections
