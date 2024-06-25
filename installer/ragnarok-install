@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.14 2024/06/25 16:25:24 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.15 2024/06/25 18:20:21 lecorbeau Exp $
 
 set -e
 
@@ -139,13 +139,15 @@ install_sets() {
 	local _resp _sets
 
 	read -r _resp?"The following sets will be installed:
-[+] base    | The base system.
+[X] base    | The base system.
 [x] devel   | The git, build-essential and LLVM/Clang toolchain.
 [x] xfonts  | Extra fonts for xserv.
 [x] xprogs  | Window Managers (Raven, cwm) + ragnarok-terminal and dmenu.
 [x] xserv   | Minimal xorg + xinit.
 
-To omit one or more set, simply type <setname> (e.g. xfonts, or xfonts xprogs xserv). Then press Return to install the sets. Leave empty to install all sets.
+Leave empty to install all sets, or else type the name of the sets to be installed.
+Press Return when done.
+
 Note: the base set cannot be omitted.
 
 Sets to install [all]: "
