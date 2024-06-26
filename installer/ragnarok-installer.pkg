@@ -3,6 +3,7 @@ Version: 01
 Maintainer: Ian LeCorbeau <I-LeCorbeau@protonmail.com>
 Architecture: amd64
 Section: devel
+Depends: arch-install-scripts
 Files: bin/ragnarok-installer /usr/bin/
  etc/install.conf /etc/install.conf
  usr/libexec/ragnarok-install/hooks/customize01.sh /usr/libexec/ragnarok-installer/hooks/
