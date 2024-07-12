@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.20 2024/07/12 15:07:59 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.21 2024/07/12 15:14:51 lecorbeau Exp $
 
 set -e
 
@@ -190,6 +190,12 @@ set_grub() {
 	arch-chroot /mnt/ update-grub
 }
 
+# Update the manual pages
+update_man() {
+	msg "Updating manual pages database..."
+	/usr/sbin/makewhatis /usr/share/man/
+}
+
 # Cleanup.
 cleanup() {
 	msg "Cleaning up..."
@@ -240,6 +246,7 @@ main() {
 	inst_kern
 	install_sets
 	set_grub
+	update_man
 	cleanup
 }
 
