@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.19 2024/07/12 15:05:31 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.20 2024/07/12 15:07:59 lecorbeau Exp $
 
 set -e
 
@@ -90,15 +90,7 @@ set_hosts() {
 	local _resp
 
 	read -r _resp?"Enter the hostname of the machine: "
-	msg "$_resp" > /mnt/etc/hostname
-	msg "127.0.0.1   localhost
-127.0.1.1   $_resp
-
-
-# IPv6
-::1         localhost ip6-localhost ip6-loopback
-ff02::1     ip6-allnodes
-ff02::2     ip6-allrouters" > /mnt/etc/hosts
+	sed -i "s/ragnarok/$_resp/g" /mnt/etc/hosts /mnt/etc/hostname
 }
 
 # Set locales and keyboard config
