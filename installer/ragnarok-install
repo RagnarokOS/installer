@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.18 2024/06/26 17:42:30 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.19 2024/07/12 15:05:31 lecorbeau Exp $
 
 set -e
 
@@ -46,15 +46,15 @@ msg() {
 
 # Download the tarball
 get_tarball() {
-	local _file="miniroot${VERSION}.tgz"
+	local _file="base${VERSION}.tgz"
 
 	msg "Fetching ${_file}..."
 	unpriv -f "${TMP}/${_file}" "wget -q --show-progress -P ${TMP} -O ${_file} ${URL}/${_file}"
 }
 
-# Extract miniroot.tgz
+# Extract base tarball.
 extract() {
-	tar xzpvf "${TMP}/miniroot${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C /mnt
+	tar xzpvf "${TMP}/base${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C /mnt
 }
 
 # Set up fstab
@@ -131,11 +131,6 @@ inst_kern() {
 	# First, install Debian's standard kernel as a back up.
 	arch-chroot /mnt/ apt-get install linux-image-amd64
 	arch-chroot /mnt/ kernupd
-}
-
-# Install the base set
-install_base() {
-	arch-chroot /mnt apt-get install ragnarok-base
 }
 
 # Let user decide which extra set(s) to install.
@@ -251,7 +246,6 @@ main() {
 	set_rootpass
 	set_user
 	inst_kern
-	install_base
 	install_sets
 	set_grub
 	cleanup
