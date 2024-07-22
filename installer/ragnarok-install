@@ -1,19 +1,24 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.21 2024/07/12 15:14:51 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.22 2024/07/22 17:45:30 lecorbeau Exp $
 
 set -e
 
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
-CODENAME=$(awk '/Codename/ { print $3 }' install.conf)
-FLAVOUR=$(awk '/Flavour/ { print $3 }' install.conf)
-VARIANT=$(awk '/Variant/ { print $3 }' install.conf)
-COMPONENTS=$(awk '/Components/ { print $3 }' install.conf)
-MIRROR=$(awk '/Mirror/ { print $3 }' install.conf)
-VERSION=$(awk 'Version/ { print $3 }' install.conf)
+CODENAME="Dyeus"
+FLAVOUR="bookworm"
+VARIANT="minbase"
+COMPONENTS="main non-free-firmware"
+MIRROR="https://github.com/RagnarokOS/base/releases/download/"
+VERSION="01"
 URL="${MIRROR}${VERSION}"
+
+TZ=$(awk '/Timezone/ { print $3 }' install.conf)
+LOCALE=$(awk '/Locale/ { print $3 }' install.conf)
+KEYMAP=$(awk '/Keymap/ { print $3 }' install.conf)
+HOSTNAME=$(awk '/Hostname/ { print $3 }' install.conf)
 
 # Never download stuff off the internet as the root user.
 # I take no credit for this function. All credit goes to
