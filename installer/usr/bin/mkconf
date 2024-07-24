@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.1 2024/07/24 18:03:07 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.2 2024/07/24 18:05:43 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -50,7 +50,7 @@ ask_locale() {
 
 	read -r _resp?"$_q "
 	case "$_resp" in
-		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/locales.list; ask_tz "$@"
+		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/locales.list; ask_locale "$@"
 			;;
 		*)	set_val LOCALE "$_resp" "$CONF"
 			;;
@@ -63,7 +63,7 @@ ask_kb() {
 
 	read -r _resp?"$_q "
 	case "$_resp" in
-		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/xkblayout.list; ask_tz "$@"
+		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/xkblayout.list; ask_kb "$@"
 			;;
 		*)	set_val XKB_LAYOUT "$_resp" "$CONF"
 			;;
@@ -71,40 +71,3 @@ ask_kb() {
 }
 ask_kb "Set the keyboard layout. e.g. 'us'. ('l' for a list of available layouts):"
 
-echo
-# Root password
-askpass "Password for the root account (will not echo).
-Note: storing passwords in plain text is a terrible idea. This should be a
-temporary password only and should be changed on first boot. Leave empty if
-you'd rather be prompted for a password at install time." ROOTPASS "$CONF"
-echo
-echo
-# Setup user
-askconf "Name for default user (leave blank to setup user after first boot):" USERNAME "$CONF"
-echo
-echo
-# User password
-askpass "Password for the root account (will not echo).
-Note: storing passwords in plain text is a terrible idea. This should be a
-temporary password only and should be changed on first boot. Leave empty if
-you'd rather be prompted for a password at install time." USERPASS "$CONF"
-echo
-echo
-# X or no X
-askconf "Will this system use X11? ('yes' or 'no')?:" X11 "$CONF"
-
-echo
-askconf "Should this system be installed from scratch, or using the sets? ('netinstall' or 'sets'):" SETS "$CONF"
-
-if [[ $(get_val SETS "$CONF") == sets ]]; then
-	echo
-	# The sets should be fetched from where
-	askconf "Location of the base system? ('disk' or 'network'. 'l' to view list and description)" BASELOC "$CONF"
-
-	echo
-	if [[ $(get_val BASELOC "$CONF") == disk ]]; then
-		askconf "Enter the disk path where the sets are located ('live' or full path to device, e.g. /dev/sdX1):" SETPATH "$CONF"
-	elif [[ $(get_val BASELOC "$CONF") == net ]]; then
-		askconf "Enter the source to fetch the sets from ('default' or url, e.g. https://example.com/ragnarok-sets):" SETSRC "$CONF"
-	fi
-fi
