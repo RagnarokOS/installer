@@ -23,14 +23,14 @@
 set_val() {
 	local _conf="$1" _value="$2" _file="$3"
 
-	printf '%s\n' "${_conf}=${_value}" >> "$_file"
+	printf '%s\n' "${_conf} = ${_value}" >> "$_file"
 }
 
 # Get config value from conf files
 get_val() {
 	local _conf="$1" _file="$2"
 
-	grep "${_conf}" "$_file" | cut -d '=' -f2
+	awk -v var="$_conf" '$0 ~ var { print $3 }' "$_file"
 }
 
 reset_val() {
