@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.2 2024/07/24 18:05:43 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.3 2024/07/25 00:20:24 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -25,9 +25,6 @@ CONF=${CONF:-install.conf}
 
 . /lib/ragnarok-installer/funcs
 
-# Hostname
-askconf "Hostname for this machine?" HOSTNAME "$CONF"
-
 # In some cases a user should be able to display a list of available options.
 # Unfortunately, we can't use variables piped through less as it gives very
 # inconsistent (or non-existent) results. So each of them need their own
@@ -43,7 +40,6 @@ ask_tz() {
 			;;
 	esac
 }
-ask_tz "Enter the time zone for this system. e.g. America/New_York. ('l' for a list of supported time zones):"
 
 ask_locale() {
 	local _resp _q="$1"
@@ -56,7 +52,6 @@ ask_locale() {
 			;;
 	esac
 }
-ask_locale "Enter the locale for this system. e.g. en_US.UTF-8 ('l' for a list of supported locales):"
 
 ask_kb() {
 	local _resp _q="$1"
@@ -69,5 +64,24 @@ ask_kb() {
 			;;
 	esac
 }
+
+# Function for set selection
+install_sets() {
+}
+
+## Begin actual script.
+
+# Hostname
+askconf "Hostname for this machine?" HOSTNAME "$CONF"
+
+# Timezone
+ask_tz "Enter the time zone for this system. e.g. America/New_York. ('l' for a list of supported time zones):"
+
+# Locale
+ask_locale "Enter the locale for this system. e.g. en_US.UTF-8 ('l' for a list of supported locales):"
+
+# Keyboard layout
 ask_kb "Set the keyboard layout. e.g. 'us'. ('l' for a list of available layouts):"
 
+# Sets/metapackage selection
+ask_sets
