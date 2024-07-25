@@ -1,11 +1,11 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.4 2024/07/25 16:31:03 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.5 2024/07/25 18:05:38 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
-#	Copyright (c) 2023, Ian LeCorbeau <I-LeCorbeau (at) protonmail (dot) com>	#
+#	Copyright (c) 2023-2024, Ian LeCorbeau <I-LeCorbeau@protonmail.com>		#
 #											#
 #	Permission to use, copy, modify, and/or distribute this software for any	#
 #	purpose with or without fee is hereby granted, provided that the above		#
@@ -66,7 +66,7 @@ ask_kb() {
 }
 
 # Function for set selection
-install_sets() {
+ask_sets() {
 	local _resp _sets _Yn
 
 	read -r _resp?"Aside from the base system, the following sets (metapackages)
@@ -82,6 +82,28 @@ Press Return when done.
 
 Sets to install [all]: "
 	echo
+
+	# We need word splitting.
+	# shellcheck disable=SC2086
+	if [[ -n $_resp ]]; then
+		set -A _sets -- $_resp
+	else
+		set -A _sets -- devel virt xserv xfonts xprogs
+	fi
+
+	read -r _Yn?"The following sets will be installed: ${_sets[*]}. Proceed? (Y/n): "
+	case "$_Yn" in
+		Y|y)	for _set in "${_sets[@]}"; do
+				set_val "$_set" Yes "$CONF"
+			done
+			;;
+		N|n)	sed -i '/Yes/d' "$CONF"
+			;;
+		*)	for _set in "${_sets[@]}"; do
+				set_val "$_set" Yes "$CONF"
+			done
+			;;
+	esac
 
 }
 
