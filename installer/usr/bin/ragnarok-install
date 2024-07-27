@@ -1,9 +1,11 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.23 2024/07/26 15:50:22 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.24 2024/07/27 15:35:55 lecorbeau Exp $
 
 set -e
+
+. /lib/ragnarok-installer/funcs
 
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
