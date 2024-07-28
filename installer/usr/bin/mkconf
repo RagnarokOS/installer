@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.5 2024/07/25 18:05:38 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.6 2024/07/28 15:50:24 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -23,7 +23,12 @@
 
 CONF=${CONF:-install.conf}
 
-. /lib/ragnarok-installer/funcs
+# Set values in conf files
+set_val() {
+	local _conf="$1" _value="$2" _file="$3"
+
+	printf '%s\n' "${_conf} = ${_value}" >> "$_file"
+}
 
 # In some cases a user should be able to display a list of available options.
 # Unfortunately, we can't use variables piped through less as it gives very
