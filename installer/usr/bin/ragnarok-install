@@ -1,11 +1,9 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.26 2024/07/29 17:20:08 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.27 2024/07/29 19:52:53 lecorbeau Exp $
 
 set -e
-
-. /lib/ragnarok-installer/funcs
 
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
@@ -96,7 +94,15 @@ refresh_repo() {
 
 # Setting the timezone
 set_tz() {
-	 arch-chroot /mnt dpkg-reconfigure tzdata
+	local _tz _area _zone
+
+	_tz=$(get_val Timezone "$CONF")
+	_area=${_tz%%/*}
+	_zone=${_tz##/*}
+
+	echo "tzdata tzdata/Areas select $_area" | arch-chroot /mnt debconf-set-selections
+	echo "tzdata tzdata/Zones/$_zone select $_zone" | arch-chroot /mnt debconf-set-selections
+	echo 'tzdata tzdata/Zones/Etc select UTC' | arch-chroot /mnt debconf-set-selections
 }
 
 # Setup /etc/hosts and /etc/hostname
