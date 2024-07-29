@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.9 2024/07/29 19:27:13 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.10 2024/07/29 19:32:26 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -34,7 +34,7 @@ set_val() {
 ask_hosts() {
 	local _resp
 
-	read -r _resp$"Enter the hostname for this system: "
+	read -r _resp?"Enter the hostname for this system: "
 	set_val Hostname "$_resp" "$CONF"
 }
 
