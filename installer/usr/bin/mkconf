@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.7 2024/07/29 17:49:43 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.8 2024/07/29 17:55:27 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -41,7 +41,7 @@ ask_tz() {
 	case "$_resp" in
 		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/tz.list; ask_tz "$@"
 			;;
-		*)	set_val TZ "$_resp" "$CONF"
+		*)	set_val Timezone "$_resp" "$CONF"
 			;;
 	esac
 }
@@ -53,7 +53,7 @@ ask_locale() {
 	case "$_resp" in
 		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/locales.list; ask_locale "$@"
 			;;
-		*)	set_val LOCALE "$_resp" "$CONF"
+		*)	set_val Locale "$_resp" "$CONF"
 			;;
 	esac
 }
@@ -65,7 +65,7 @@ ask_kb() {
 	case "$_resp" in
 		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/xkblayout.list; ask_kb "$@"
 			;;
-		*)	set_val XKB_LAYOUT "$_resp" "$CONF"
+		*)	set_val Keymap "$_resp" "$CONF"
 			;;
 	esac
 }
