@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.6 2024/07/28 15:50:24 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.7 2024/07/29 17:49:43 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -98,15 +98,11 @@ Sets to install [all]: "
 
 	read -r _Yn?"The following sets will be installed: ${_sets[*]}. Proceed? (Y/n): "
 	case "$_Yn" in
-		Y|y)	for _set in "${_sets[@]}"; do
-				set_val "$_set" Yes "$CONF"
-			done
+		Y|y)	set_val Sets "${_sets[*]}" "$CONF"
 			;;
-		N|n)	sed -i '/Yes/d' "$CONF"
+		N|n)	ask_sets
 			;;
-		*)	for _set in "${_sets[@]}"; do
-				set_val "$_set" Yes "$CONF"
-			done
+		*)	set_val Sets "${_sets[*]}" "$CONF"
 			;;
 	esac
 
