@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.31 2024/07/30 15:48:52 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.32 2024/07/30 18:31:28 lecorbeau Exp $
 
 set -e
 
@@ -118,7 +118,7 @@ set_hosts() {
 	sed -i "s/ragnarok/$_hostname/g" /mnt/etc/hosts /mnt/etc/hostname
 }
 
-# Set locales and keyboard config
+# Set locales
 set_locales() {
 	local _locale _charset
 
@@ -132,6 +132,17 @@ set_locales() {
 		| arch-chroot /mnt debconf-set-selections
 	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install locales -y"
 	arch-chroot /mnt dpkg-reconfigure locales
+}
+
+# Set keymap
+set_kb() {
+	local _keymap _variant
+
+	_keymap=$(get_val Keymap "$CONF")
+	# brace yo ass
+	_variant=$(awk -v var="^${_keymap}" '$0 ~ var { $1=""; print substr($0,2) }' "$CONF")
+
+	# do the rest (needs to be tested before including here)
 }
 
 # Set root password
@@ -255,6 +266,7 @@ main() {
 	set_tz
 	set_hosts
 	set_locales
+	set_kb
 	set_rootpass
 	set_user
 	inst_kern
