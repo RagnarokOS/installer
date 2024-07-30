@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.28 2024/07/29 19:56:05 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.29 2024/07/30 15:19:38 lecorbeau Exp $
 
 set -e
 
@@ -103,6 +103,8 @@ set_tz() {
 	echo "tzdata tzdata/Areas select $_area" | arch-chroot /mnt debconf-set-selections
 	echo "tzdata tzdata/Zones/$_area select $_zone" | arch-chroot /mnt debconf-set-selections
 	echo 'tzdata tzdata/Zones/Etc select UTC' | arch-chroot /mnt debconf-set-selections
+
+	arch-chroot /mnt /bin/ksh -c 'DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata'
 }
 
 # Setup /etc/hosts and /etc/hostname
