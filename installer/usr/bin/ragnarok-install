@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.29 2024/07/30 15:19:38 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.31 2024/07/30 15:48:52 lecorbeau Exp $
 
 set -e
 
@@ -100,27 +100,38 @@ set_tz() {
 	_area=${_tz%%/*}
 	_zone=${_tz##/*}
 
+	msg "Setting the timezone..."
 	echo "tzdata tzdata/Areas select $_area" | arch-chroot /mnt debconf-set-selections
 	echo "tzdata tzdata/Zones/$_area select $_zone" | arch-chroot /mnt debconf-set-selections
 	echo 'tzdata tzdata/Zones/Etc select UTC' | arch-chroot /mnt debconf-set-selections
 
-	arch-chroot /mnt /bin/ksh -c 'DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata'
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata"
 }
 
 # Setup /etc/hosts and /etc/hostname
 set_hosts() {
-	local _resp
+	local _hostname
 
-	read -r _resp?"Enter the hostname of the machine: "
-	sed -i "s/ragnarok/$_resp/g" /mnt/etc/hosts /mnt/etc/hostname
+	_hostname=$(get_val Hostname "$CONF")
+
+	msg "Setting up hostname and hosts file..."
+	sed -i "s/ragnarok/$_hostname/g" /mnt/etc/hosts /mnt/etc/hostname
 }
 
 # Set locales and keyboard config
-set_lokb() {
-	msg "Setting up locales and keyboard config..."
-	arch-chroot /mnt apt-get install locales -y
+set_locales() {
+	local _locale _charset
+
+	_locale=$(get_val Locale "$CONF")
+	_charset=$(awk '/Locale/ { print $4 }' "$CONF")
+
+	msg "Setting up locales..."
+	echo "locales locales/default_environment_local select $_locale" \
+		| arch-chroot /mnt debconf-set-selection
+	echo "locales locales_to_be_generated multiselect $_locale $_charset" \
+		| arch-chroot /mnt debconf-set-selections
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install locales -y"
 	arch-chroot /mnt dpkg-reconfigure locales
-	arch-chroot /mnt apt-get install console-setup -y
 }
 
 # Set root password
@@ -243,7 +254,7 @@ main() {
 	refresh_repo
 	set_tz
 	set_hosts
-	set_lokb
+	set_locales
 	set_rootpass
 	set_user
 	inst_kern
