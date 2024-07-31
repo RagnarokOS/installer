@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.34 2024/07/31 17:46:04 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.35 2024/07/31 18:06:22 lecorbeau Exp $
 
 set -e
 
@@ -142,6 +142,10 @@ set_kb() {
 	_variant=$(get_val KB_Variant "$CONF")
 
 	# NOTE: don't forget to do console-setup as well.
+	# NOTE 2: Perhaps there's no need to use debconf-set-selections for that. It's possible
+	# that creating the files in /etc/default (console-setup and keyboard) and entering the
+	# values before install/configuring is enough. Do a manual install of the system to test
+	# it.
 	echo "keyboard-configuration keyboard-configuration/model select Generic 105-key PC" \
 		| arch-chroot /mnt debconf-set-selections
 	echo "keyboard-configuration keyboard-configuration/layoutcode string $_keymap" \
