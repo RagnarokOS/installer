@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.33 2024/07/30 22:46:52 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.34 2024/07/31 17:46:04 lecorbeau Exp $
 
 set -e
 
@@ -126,12 +126,12 @@ set_locales() {
 	_charset=$(awk '/Locale/ { print $4 }' "$CONF")
 
 	msg "Setting up locales..."
-	echo "locales locales/default_environment_local select $_locale" \
+	echo "locales locales/default_environment_locale select $_locale" \
 		| arch-chroot /mnt debconf-set-selection
 	echo "locales locales_to_be_generated multiselect $_locale $_charset" \
 		| arch-chroot /mnt debconf-set-selections
-	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install locales -y"
-	arch-chroot /mnt dpkg-reconfigure locales
+	arch-chroot /mnt apt-get install locales -y
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales"
 }
 
 # Set keymap
@@ -139,9 +139,22 @@ set_kb() {
 	local _keymap _variant
 
 	_keymap=$(get_val KB_Layout "$CONF")
-	# brace yo ass
 	_variant=$(get_val KB_Variant "$CONF")
 
+	# NOTE: don't forget to do console-setup as well.
+	echo "keyboard-configuration keyboard-configuration/model select Generic 105-key PC" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/layoutcode string $_keymap" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/variant select $_variant" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/xkb-keymap select $_keymap" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true" \
+		| arch-chroot /mnt debconf-set-selections
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install console-setup -y"
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure console-setup"
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration"
 }
 
 # Set root password
