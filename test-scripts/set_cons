@@ -7,35 +7,72 @@
 . ../installer/lib/ragnarok-installer/funcs
 
 CONF="install.conf"
+_locale=$(get_val Locale "$CONF")
 
-setup_cons() {
-	local _locale
+case "$_locale" in
+	*KOI8*|*koi8*)
+		CODESET=CyrKoi
+		;;
+	aa_*|af_*|an_*|ast_*|br_*|ca_*|da_*|de_*|en_*|es_*|et_*|eu_*|fi_*|fo_*|fr_*|gd_*|gl_*|gv_*|id_*|is_*|it_*|kl_*|kw_*|lg_*|ms_*|nb_*|nl_*|nn_*|oc_*|om_*|pt_*|sid_*|so_*|sq_*|st_*|sv_*|tl_*|tr_*|tt_*|uz_*|wa_*|xh_*|zu_*)
+		CODESET=Lat15
+		;;
+	am_*|byn_*|gez_*|ti_*|tig_*)
+		CODESET=Ethiopian
+		;;
+	ar_*|fa_*|ur_*)
+		CODESET=Arabic
+		;;
+	az_*bs_*)
+		CODESET=Uni3
+		;;
+	be_*|bg_*|mk_*|ru_*|sr_*|uk_*)
+		CODESET=CyrSlav
+		;;
+	bn_*|gu_*|hi_*|ja_*|kn_*|ko_*|ml_*|mr_*|ne_*|pa_*|ta_*|te_*|zh_*)
+		CODESET=unsupported
+		;;
+	cs_*|hr_*|hu_*|pl_*|ro_*|sk_*|sl_*)
+		CODESET=Lat2
+		;;
+	cy_*|eo|eo_*|eo\@*|ga_*|mt_*)
+		CODESET=Lat38
+		;;
+	el_*)
+		CODESET=Greek
+		;;
+	he_*|iw_*|yi_*)
+		CODESET=Hebrew
+		;;
+	hy_*)
+		CODESET=Armenian
+		;;
+	ka_*)
+		CODESET=Georgian
+		;;
+	lo_*)
+		CODESET=Lao
+		;;
+	lt_*|lv_*|mi_*)
+		CODESET=Lat7
+		;;
+	ky_*|mn_*|tg_*|uz_*\@cyrillic)
+		CODESET=CyrAsia
+		;;
+	se_*)
+		CODESET=Uni1
+		;;
+	th_*)
+		CODESET=Thai
+		;;
+	vi_*)
+		CODESET=Vietnamese
+		;;
+	*)	
+		CODESET=guess
+		;;
+esac
 
-	_locale=$(get_val Locale "$CONF")
-
-	case "$_locale" in
-		*KOI8*|*koi8*)
-			CODESET=CyrKoi
-			;;
-		aa_*|af_*|an_*|ast_*|br_*|ca_*|da_*|de_*|en_*|es_*|et_*|eu_*|fi_*|fo_*|fr_*|gd_*|gl_*|gv_*|id_*|is_*|it_*|kl_*|kw_*|lg_*|ms_*|nb_*|nl_*|nn_*|oc_*|om_*|pt_*|sid_*|so_*|sq_*|st_*|sv_*|tl_*|tr_*|tt_*|uz_*|wa_*|xh_*|zu_*)
-			CODESET=Lat15
-			;;
-		am_*|byn_*|gez_*|ti_*|tig_*)
-			CODESET=Ethiopian
-			;;
-		ar_*|fa_*|ur_*)
-			CODESET=Arabic
-			;;
-		az_*bs_*)
-			CODESET=Uni3
-			;;
-		be_*|bg_*|mk_*|ru_*|sr_*|uk_*)
-			CODESET=CyrSlav
-			;;
-		*)	echo "Wut?"
-			exit 1
-			;;
-	esac
-}
-setup_cons
+if [[ $CODESET = unsupported ]]; then
+	CODESET=guess
+fi
 echo "$CODESET"
