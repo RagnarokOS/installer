@@ -102,12 +102,20 @@ fi
 # it for Lat15 because it's the only one I know for sure will look good.
 # If anyone wants to test it on other codesets, be my guess.
 # NOTE: This should be done at the end of console-setup.
-case "$CODESET" in
-	Lat15)
-		sed -i 's/FONTFACE/#&/' /mnt/etc/default/console-setup
-		sed -i 's/FONTSIZE/#&/' /mnt/etc/default/console-setup
-		printf '%s\n' 'FONT="spleen-8x16.psfu.gz' >> /mnt/etc/default/console-setup
-esac
+# NOTE 2: Only do this if xfonts is part of the selected sets because the
+# spleen package pulls some X stuff and that should be avoided on systems
+# that don't want X at all (even if the X stuff pulled is small). I will
+# package the console font for spleen individually so that it can be added
+# to the base system without pulling in any dependency.
+if grep -q "xfonts" "$CONF"; then
+	case "$CODESET" in
+		Lat15)
+			sed -i 's/FONTFACE/#&/' /mnt/etc/default/console-setup
+			sed -i 's/FONTSIZE/#&/' /mnt/etc/default/console-setup
+			printf '%s\n' 'FONT="spleen-8x16.psfu.gz' >> /mnt/etc/default/console-setup
+			;;
+	esac
+fi
 
 echo "$CODESET"
 echo "$FONTFACE"
