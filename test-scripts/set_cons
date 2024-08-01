@@ -98,14 +98,15 @@ if lsmod 2> /dev/null | grep -q speakup; then
 	esac
 fi
 
-# If $FONTFACE is Lat15, set the console font as spleen. We can only do
+# If $CODESET is Lat15, set the console font to spleen. We can only do
 # it for Lat15 because it's the only one I know for sure will look good.
-# If anyone wants to test it on other fontfaces, be my guess.
+# If anyone wants to test it on other codesets, be my guess.
 # NOTE: This should be done at the end of console-setup.
 case "$CODESET" in
 	Lat15)
-		sed -i 's/FONTFACE/#&/' install.conf
-		printf '%s\n' 'FONT="spleen-8x16.psfu.gz' >> install.conf
+		sed -i 's/FONTFACE/#&/' /mnt/etc/default/console-setup
+		sed -i 's/FONTSIZE/#&/' /mnt/etc/default/console-setup
+		printf '%s\n' 'FONT="spleen-8x16.psfu.gz' >> /mnt/etc/default/console-setup
 esac
 
 echo "$CODESET"
