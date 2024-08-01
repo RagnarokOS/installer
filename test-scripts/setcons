@@ -1,0 +1,3 @@
+#!/bin/ksh
+
+# Configuring the console based on the locale chosen by the user.
