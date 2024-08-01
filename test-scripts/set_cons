@@ -9,6 +9,7 @@
 CONF="install.conf"
 _locale=$(get_val Locale "$CONF")
 
+# Set the codeset
 case "$_locale" in
 	*KOI8*|*koi8*)
 		CODESET=CyrKoi
@@ -75,4 +76,27 @@ esac
 if [[ $CODESET = unsupported ]]; then
 	CODESET=guess
 fi
+
+# Set the font
+case "$CODESET" in
+	Arabic|CyrKoi|Uni1)
+		FONTFACE=VGA
+		;;
+	Ethiopian)
+		FONTFACE=Goha
+		;;
+	*)
+		FONTFACE=Fixed
+		;;
+esac
+
+if lsmod 2> /dev/null | grep -q speakup; then
+	case "$CODESET" in
+		CyrAsia|CyrSlav|Greek)
+			CODESET="Full${CODESET}"
+			;;
+	esac
+fi
+
 echo "$CODESET"
+echo "$FONTFACE"
