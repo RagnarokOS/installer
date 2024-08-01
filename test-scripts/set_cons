@@ -1,0 +1,41 @@
+#!/bin/ksh
+
+# Configuring the console based on the locale chosen by the user.
+# Credits to the d-i team for leading me in the right direction
+# with console-setup.config.
+
+. ../installer/lib/ragnarok-installer/funcs
+
+CONF="install.conf"
+
+setup_cons() {
+	local _locale
+
+	_locale=$(get_val Locale "$CONF")
+
+	case "$_locale" in
+		*KOI8*|*koi8*)
+			CODESET=CyrKoi
+			;;
+		aa_*|af_*|an_*|ast_*|br_*|ca_*|da_*|de_*|en_*|es_*|et_*|eu_*|fi_*|fo_*|fr_*|gd_*|gl_*|gv_*|id_*|is_*|it_*|kl_*|kw_*|lg_*|ms_*|nb_*|nl_*|nn_*|oc_*|om_*|pt_*|sid_*|so_*|sq_*|st_*|sv_*|tl_*|tr_*|tt_*|uz_*|wa_*|xh_*|zu_*)
+			CODESET=Lat15
+			;;
+		am_*|byn_*|gez_*|ti_*|tig_*)
+			CODESET=Ethiopian
+			;;
+		ar_*|fa_*|ur_*)
+			CODESET=Arabic
+			;;
+		az_*bs_*)
+			CODESET=Uni3
+			;;
+		be_*|bg_*|mk_*|ru_*|sr_*|uk_*)
+			CODESET=CyrSlav
+			;;
+		*)	echo "Wut?"
+			exit 1
+			;;
+	esac
+}
+setup_cons
+echo "$CODESET"
