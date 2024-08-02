@@ -8,6 +8,14 @@
 
 CONF="install.conf"
 _locale=$(get_val Locale "$CONF")
+_charmap=$(awk '/Locale/ { print $4 }' "$CONF")
+
+# Wrapper around arch-chroot and debconf-set-selections
+set_opt() {
+	local _conf=$1 _opt=$2 _set=$3 _val=$4
+
+	echo "${_conf} ${_conf}/${_opt} ${_set} ${_val}" | arch-chroot /mnt debconf-set-selections
+}
 
 # Set the codeset
 case "$_locale" in
@@ -97,6 +105,17 @@ if lsmod 2> /dev/null | grep -q speakup; then
 			;;
 	esac
 fi
+
+FONTSIZE="8x16"
+
+# Set the default using debconf-set-selections
+set_opt console-setup charmap47 select "$_charmap"
+set_opt console-setup codeset47 select "$CODESET"
+set_opt console-setup codesetcode select "$CODESET"
+set_opt console-setup fontface47 select "$FONTFACE"
+set_opt console-setup fontsize-text47 select "$FONTSIZE"
+set_opt console-setup fontsize-fb47 select "$FONTSIZE"
+set_opt console-setup fontsize string "$FONTSIZE"
 
 # If $CODESET is Lat15, set the console font to spleen. We can only do
 # it for Lat15 because it's the only one I know for sure will look good.
