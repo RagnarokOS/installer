@@ -1,9 +1,11 @@
 ## Library containing functions used by Ragnarok's installers (plain-text
 ## and TUI), as well as other tools (mkdisk, etc).
 
+# $Ragnarok: funcs,v 1.1 2024/08/02 16:18:21 lecorbeau Exp $
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
-#	Copyright (c) 2023, Ian LeCorbeau <I-LeCorbeau (at) protonmail (dot) com>	#
+#	Copyright (c) 2023-2024, Ian LeCorbeau <I-LeCorbeau (at) protonmail (dot) com>	#
 #											#
 #	Permission to use, copy, modify, and/or distribute this software for any	#
 #	purpose with or without fee is hereby granted, provided that the above		#
@@ -37,6 +39,13 @@ reset_val() {
 	local _conf="$1" _file="$2"
 
 	sed -i "/$_conf/d" "$_file"
+}
+
+# Wrapper around arch-chroot and debconf-set-selections
+set_opt() {
+	local _conf=$1 _opt=$2 _set=$3 _val=$4
+
+	echo "${_conf} ${_conf}/${_opt} ${_set} ${_val}" | arch-chroot /mnt debconf-set-selections
 }
 
 # Ask user a config question and log the answer in the conf file
