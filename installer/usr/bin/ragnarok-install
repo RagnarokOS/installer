@@ -1,9 +1,11 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.35 2024/07/31 18:06:22 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.36 2024/08/02 16:14:42 lecorbeau Exp $
 
 set -e
+
+. /usr/lib/ragnarok-installer/funcs
 
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
@@ -40,13 +42,6 @@ unpriv() {
 	[[ -n ${_file} ]] && chown root "${_file}"
 
 	return ${_ret}
-}
-
-# Get config value from install.conf
-get_val() {
-	local _conf="$1" _file="$2"
-
-	awk -v var="$_conf" '$0 ~ var { print $3 }' "$_file"
 }
 
 # This is shorter than constantly writing the printf command
@@ -132,6 +127,11 @@ set_locales() {
 		| arch-chroot /mnt debconf-set-selections
 	arch-chroot /mnt apt-get install locales -y
 	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales"
+}
+
+# Setup the console
+set_cons() {
+
 }
 
 # Set keymap
