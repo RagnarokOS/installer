@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.36 2024/08/02 16:14:42 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.37 2024/08/02 16:36:47 lecorbeau Exp $
 
 set -e
 
@@ -131,7 +131,24 @@ set_locales() {
 
 # Setup the console
 set_cons() {
+	local _locale _charmap
 
+	# Using the setcons script for that in order to keep the installer
+	# as small as humanly possible.
+	setcons "$_locale" "$_charmap"
+
+	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install console-setup -y"
+
+	# Set the console font to spleen if the codeset is 'Lat15'
+	if grep -q "xfonts" "$CONF"; then
+		case "$CODESET" in
+			Lat15)
+				sed -i 's/FONTFACE/#&/' /mnt/etc/default/console-setup
+				sed -i 's/FONTSIZE/#&/' /mnt/etc/default/console-setup
+				printf '%s\n' 'FONT="spleen-8x16.psfu.gz' >> /mnt/etc/default/console-setup
+				;;
+		esac
+	fi
 }
 
 # Set keymap
@@ -156,8 +173,6 @@ set_kb() {
 		| arch-chroot /mnt debconf-set-selections
 	echo "keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true" \
 		| arch-chroot /mnt debconf-set-selections
-	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install console-setup -y"
-	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure console-setup"
 	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration"
 }
 
