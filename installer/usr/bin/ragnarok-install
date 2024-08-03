@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.37 2024/08/02 16:36:47 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.38 2024/08/03 15:48:07 lecorbeau Exp $
 
 set -e
 
@@ -158,22 +158,26 @@ set_kb() {
 	_keymap=$(get_val KB_Layout "$CONF")
 	_variant=$(get_val KB_Variant "$CONF")
 
-	# NOTE: don't forget to do console-setup as well.
-	# NOTE 2: Perhaps there's no need to use debconf-set-selections for that. It's possible
-	# that creating the files in /etc/default (console-setup and keyboard) and entering the
-	# values before install/configuring is enough. Do a manual install of the system to test
-	# it.
-	echo "keyboard-configuration keyboard-configuration/model select Generic 105-key PC" \
-		| arch-chroot /mnt debconf-set-selections
-	echo "keyboard-configuration keyboard-configuration/layoutcode string $_keymap" \
-		| arch-chroot /mnt debconf-set-selections
-	echo "keyboard-configuration keyboard-configuration/variant select $_variant" \
-		| arch-chroot /mnt debconf-set-selections
-	echo "keyboard-configuration keyboard-configuration/xkb-keymap select $_keymap" \
-		| arch-chroot /mnt debconf-set-selections
-	echo "keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true" \
-		| arch-chroot /mnt debconf-set-selections
-	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration"
+	# NOTE: comment this out and use /etc/default/keyboard instead.
+	# Keep it here though, in case the other method causes issues.
+	#echo "keyboard-configuration keyboard-configuration/model select Generic 105-key PC" \
+	#	| arch-chroot /mnt debconf-set-selections
+	#echo "keyboard-configuration keyboard-configuration/layoutcode string $_keymap" \
+	#	| arch-chroot /mnt debconf-set-selections
+	#echo "keyboard-configuration keyboard-configuration/variant select $_variant" \
+	#	| arch-chroot /mnt debconf-set-selections
+	#echo "keyboard-configuration keyboard-configuration/xkb-keymap select $_keymap" \
+	#	| arch-chroot /mnt debconf-set-selections
+	#echo "keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true" \
+	#	| arch-chroot /mnt debconf-set-selections
+	
+	printf '%s\n' "XKBMODEL=\"pc105\"
+XKBLAYOUT=\"$_keymap\"
+XKBVARIANT=\"\"
+XKBOPTIONS=\"\"
+
+BACKSPACE=\"guess\""> /mnt/etc/default/keyboard
+	arch-chroot /mnt /bin/ksh -c "dpkg-reconfigure -f noninteractive keyboard-configuration"
 }
 
 # Set root password
