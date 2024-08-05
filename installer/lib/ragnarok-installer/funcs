@@ -1,7 +1,7 @@
 ## Library containing functions used by Ragnarok's installers (plain-text
 ## and TUI), as well as other tools (mkdisk, etc).
 
-# $Ragnarok: funcs,v 1.1 2024/08/02 16:18:21 lecorbeau Exp $
+# $Ragnarok: funcs,v 1.2 2024/08/05 17:15:09 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -20,6 +20,13 @@
 #	OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.			#
 #											#
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# This is shorter than constantly writing the printf command
+msg() {
+	local _msg=$1
+
+	printf '%s\n' "$_msg"
+}
 
 # Set values in conf files
 set_val() {
