@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.41 2024/08/05 17:14:52 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.42 2024/08/05 17:26:58 lecorbeau Exp $
 
 set -e
 
@@ -223,9 +223,13 @@ install_sets() {
 	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
 
 	msg "Installing the sets..."
-	for _set in "${_sets[@]}"; do
-		installcmd "ragnarok-${_set}"
-	done
+	if [[ ${_sets[*]} == none ]]; then
+		msg "No sets selected, skipping..."
+	else
+		for _set in "${_sets[@]}"; do
+			installcmd "ragnarok-${_set}"
+		done
+	fi
 
 }
 
