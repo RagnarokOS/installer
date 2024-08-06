@@ -1,0 +1,18 @@
+Package: ragnarok-installer
+Version: 01
+Maintainer: Ian LeCorbeau <I-LeCorbeau@protonmail.com>
+Architecture: amd64
+Section: devel
+Depends: arch-install-scripts
+Files: installer/usr/bin/ragnarok-installer /usr/bin/
+ installer/usr/bin/mkconf /usr/bin
+ installer/usr/bin/setcons /usr/bin
+ installer/usr/share/lists/locales.list /usr/share/ragnarok-installer/lists
+ installer/usr/share/lists/tz.list /usr/share/ragnarok-installer/lists
+ installer/usr/share/lists/xkblayout.list /usr/share/ragnarok-installer/lists
+ installer/lib/ragnarok-installer/funcs /lib/ragnarok-installer
+Readme: README.md
+Copyright: LICENSE
+Changelog: changelog
+Description: ragnarok-installer
+ Ragnarok's installer.
