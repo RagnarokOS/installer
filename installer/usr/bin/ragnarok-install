@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.48 2024/08/07 16:10:37 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.49 2024/08/07 16:16:22 lecorbeau Exp $
 
 set -e
 
@@ -107,6 +107,11 @@ set_tz() {
 	echo "tzdata tzdata/Areas select $_area" | arch-chroot /mnt debconf-set-selections
 	echo "tzdata tzdata/Zones/$_area select $_zone" | arch-chroot /mnt debconf-set-selections
 	echo 'tzdata tzdata/Zones/Etc select UTC' | arch-chroot /mnt debconf-set-selections
+
+	# This has to be done or else dpkg-reconfigure insists on using Etc
+	# as the default timezone for whatever stupid reason.
+	echo "${_area}/${_zone}" > /mnt/etc/timezone
+	arch-chroot /mnt ln -sf /usr/share/zoneinfo/"${_area}"/"${_zone}" /etc/localtime
 
 	arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata"
 }
