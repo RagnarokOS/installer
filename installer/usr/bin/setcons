@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: setcons,v 1.2 2024/08/07 17:25:36 lecorbeau Exp $
+# $Ragnarok: setcons,v 1.3 2024/08/07 17:53:37 lecorbeau Exp $
 # Configuring the console based on the locale chosen by the user.
 # Credits to the d-i team for leading me in the right direction
 # with console-setup.config.
@@ -101,9 +101,85 @@ fi
 
 FONTSIZE="8x16"
 
+# Set the codeset used by 'codeset47'.
+case "$CODESET" in
+	guess)	
+		CODESET47="Guess optimal character set"
+		;;
+	Arabic)	
+		CODESET47=". Arabic"
+		;;
+	Armenian)
+		CODESET47="# Armenian"
+		;;
+	CyrKoi)
+		CODESET47="# Cyrillic - KOI8-R and KOI-8-U"
+		;;
+	CyrAsia)
+		CODESET47="# Cyrillic - non-Slavic languages"
+		;;
+	FullCyrAsia)
+		CODESET47=". Cyrillic - non-Slavic languages (for blind users)"
+		;;
+	CyrSlav)
+		CODESET47="# Cyrillic - Slavic languages (also Bosnian and Serbian Latin)"
+		;;
+	FullCyrSlav)
+		CODESET47=". Cyrillic - Slavic languages (for blind users)"
+		;;
+	Ethiopian)
+		CODESET47=". Ethiopic"
+		;;
+	Georgian)
+		CODESET47="# Georgian"
+		;;
+	Greek)
+		CODESET47="# Greek"
+		;;
+	FullGreek)
+		CODESET47=". Greek (for blind users)"
+		;;
+	Hebrew)
+		CODESET47="# Hebrew"
+		;;
+	Lao)
+		CODESET47="# Lao"
+		;;
+	Lat15)
+		CODESET47="# Latin1 and Latin5 - western Europe and Turkic languages"
+		;;
+	Lat2)
+		CODESET47="# Latin2 - central Europe and Romanian"
+		;;
+	Lat38)
+		CODESET47="# Latin3 and Latin8 - Chichewa; Esperanto; Irishl Maltese and Welsh"
+		;;
+	Lat7)	CODESET47="# Latin7 - Lithuanian; Latvian; Maori and Marshallese"
+		;;
+	Vietnamese)
+		CODESET47=". Latin - Vietnamese"
+		;;
+	Thai)
+		CODESET47="# Thai"
+		;;
+	Uni1)
+		CODESET47=". Combined - Latin; Slavic Cyrillic; Hebrew; basic Arabic"
+		;;
+	Uni2)
+		CODESET47=". Combined - Latin; Slavic Cyrillic; Greek"
+		;;
+	Uni3)
+		CODESET47=". Combined - Latin; Slavic and non-Slavic Cyrillic"
+		;;
+	*)
+		CODESET47="Guess optimal character set"
+		;;
+esac
+
+
 # Set the default using debconf-set-selections
 set_opt console-setup charmap47 select "$_charmap"
-set_opt console-setup codeset47 select "$CODESET"
+set_opt console-setup codeset47 select "$CODESET47"
 set_opt console-setup codesetcode string "$CODESET"
 set_opt console-setup fontface47 select "$FONTFACE"
 set_opt console-setup fontsize-text47 select "$FONTSIZE"
