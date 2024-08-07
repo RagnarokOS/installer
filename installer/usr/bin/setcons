@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: setcons,v 1.1 2024/08/02 17:14:12 lecorbeau Exp $
+# $Ragnarok: setcons,v 1.2 2024/08/07 17:25:36 lecorbeau Exp $
 # Configuring the console based on the locale chosen by the user.
 # Credits to the d-i team for leading me in the right direction
 # with console-setup.config.
@@ -104,8 +104,9 @@ FONTSIZE="8x16"
 # Set the default using debconf-set-selections
 set_opt console-setup charmap47 select "$_charmap"
 set_opt console-setup codeset47 select "$CODESET"
-set_opt console-setup codesetcode select "$CODESET"
+set_opt console-setup codesetcode string "$CODESET"
 set_opt console-setup fontface47 select "$FONTFACE"
 set_opt console-setup fontsize-text47 select "$FONTSIZE"
 set_opt console-setup fontsize-fb47 select "$FONTSIZE"
 set_opt console-setup fontsize string "$FONTSIZE"
+set_opt console-setup store_defaults_in_debconf_db boolean true
