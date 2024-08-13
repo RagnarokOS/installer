@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.52 2024/08/12 15:31:27 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.53 2024/08/13 18:09:52 lecorbeau Exp $
 
 set -e
 
@@ -35,6 +35,96 @@ unpriv() {
 	[[ -n ${_file} ]] && chown root "${_file}"
 
 	return ${_ret}
+}
+
+# Actually partition the device
+part_dev() {
+	local _dev _mode _root _home _swap
+
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+	_root=$(get_val Rootsize "$CONF")
+	_home=$(get_val Homesize "$CONF")
+	_swap=$(get_val Swapsize "$CONF")
+
+	# Wipe device
+	sfidk --delete "$_dev"
+
+	# Set the proper part table (mbr for bios, GPT for EFI).
+	case "$_mode" in
+		bios)
+			(echo o) | fdisk "$_dev"
+			;;
+		efi)
+			(echo g) | fdisk "$_dev"
+			;;
+	esac
+
+	# Create the boot Partition.
+	(echo n; echo p; echo 1; echo 2048; echo +500M; echo w) | fdisk "$_dev"
+	
+	case "$_mode" in
+		bios)	sfdisk -A "$_dev" 1
+			;;
+		efi)	sfdisk --part-type "$_dev" 1 U
+			;;
+	esac
+
+	# Create the swap partition
+	(echo n; echo p; echo 1; echo ; echo +"$_swap"G; echo w) | fdisk "${_dev}"
+	sfdisk --part-type "${_dev}" 2 S
+
+	# Create the root partition
+	(echo n; echo p; echo 3; echo ; echo +"$_root"; echo w) | fdisk "${_dev}"
+
+	# Create home
+	(echo n; echo p; echo 4; echo ; echo +"$_home"; echo w) | fdisk "${_dev}"
+}
+
+# Create filesystems and mount the device
+mount_dev() {
+	local _dev _mode
+
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+
+	mkfs.vfat -F 32 "${_dev}1"
+	mkswap "${_dev}2"
+	mkfs.ext4 "${_dev}3"
+	mkfs.ext4 "${_dev}4"
+
+	swapon "${_dev}2"
+	mount -t ext4 -o errors=remount-ro "${_dev}3" /mnt
+	mkdir -p /mnt/{boot,home}
+	mount -t ext4 -o defaults "${_dev}4" /mnt/home
+	case "$_mode" in
+		bios)
+			mount -t vfat -o umask=0077,noexec,nosuid,nodev "${_dev}1" /mnt/boot
+			;;
+		efi)
+			mkdir -p /mnt/boot/efi
+			mount -t vfat -o umask=0077,noexec,nosuid,nodev "${_dev}1" /mnt/boot/efi
+			;;
+	esac
+}
+
+# Wrapper function. Ask if the installer should proceed with partitioning the device.
+mk_part() {
+	local _dev _resp
+
+	_dev=$(get_val Device "$CONF")
+
+	read -r _resp?"The following device will be formatted: ${_dev}. All data will be erased. Proceed? (Y/n): "
+	case "$_resp" in
+		N|n)
+			msg "Exiting installer. Start again..."
+			exit 1
+			;;
+		Y|y)
+			part_dev
+			mount_dev
+			;;
+	esac
 }
 
 # Download the tarball
@@ -308,6 +398,7 @@ finish() {
 
 main() {
 	run_mkconf
+	mk_part
 	get_tarball
 	extract
 	gfstab
