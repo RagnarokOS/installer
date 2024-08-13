@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.54 2024/08/13 18:12:28 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.55 2024/08/13 18:15:02 lecorbeau Exp $
 
 set -e
 
@@ -43,9 +43,9 @@ part_dev() {
 
 	_dev=$(get_val Device "$CONF")
 	_mode=$(get_val Bootmode "$CONF")
-	_root=$(get_val Rootsize "$CONF")
-	_home=$(get_val Homesize "$CONF")
-	_swap=$(get_val Swapsize "$CONF")
+	_root=$(get_val Root "$CONF")
+	_home=$(get_val Home "$CONF")
+	_swap=$(get_val Swap "$CONF")
 
 	# Wipe device
 	sfdisk --delete "$_dev"
