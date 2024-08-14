@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.14 2024/08/14 15:21:57 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.15 2024/08/14 16:32:17 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -32,25 +32,85 @@ set_val() {
 	printf '%s\n' "${_conf} = ${_value}" >> "$_file"
 }
 
+# Ask size of partitions.
+ask_part() {
+	local _resp
+
+	msg "Choose the size of each partitions. Hint: for values in megabytes, use M (e.g. 500M), for gigabytes, use G (e.g. 30G)"
+	read -r _resp?"Size of swap partition: "
+	set_val Swap "$_resp" "$CONF"
+	read -r _resp?"Size of the root partition: "
+	set_val Root "$_resp" "$CONF"
+	read -r _resp?"Size of home partition (leave empty to use remaining space): "
+	set_val Home "$_resp" "$CONF"
+}
+
 # Device setup
 mkdisk() {
-	local _resp
+	local _resp _dev _swap _root _home
 
 	lsblk
 	echo
 	read -r _resp?"Which disk should the system be installed on? (enter device, e.g. /dev/sda, or 's' to skip disk partitioning): "
+
+	# If user typed 's', skip this step.
 	if [[ $_resp == s ]]; then
-		:	# skip this step
-	else
-		set_val Device "$_resp" "$CONF"
-		msg "The installer will now create the partitions on $_resp. Choose the size of each partitions. Hint: for values in megabytes, use M (e.g. 500M), for gigabytes, use G (e.g. 30G)"
-		read -r _resp?"Size of swap partition: "
-		set_val Swap "$_resp" "$CONF"
-		read -r _resp?"Size of the root partition: "
-		set_val Root "$_resp" "$CONF"
-		read -r _resp?"Size of home partition (leave empty to use remaining space): "
-		set_val Home "$_resp" "$CONF"
+		return
 	fi
+
+	set_val Device "$_resp" "$CONF"
+
+	_dev=$(get_val Device "$CONF")
+	read -r _resp?"The installer will create partitions on ${_dev}. Warning: all data will be erased. Proceed? (Y/n): "
+	case "$_resp" in
+		Y|y)
+			ask_part
+			;;
+		N|n)
+			sed -i '/Device/d' "$CONF" 
+			mkdisk
+			;;
+		*)
+			ask_part
+			;;
+	esac
+
+	_swap=$(get_val Swap "$CONF")
+	_root=$(get_val Root "$CONF")
+	_home=$(get_val Home "$CONF")
+
+	if [[ -z "${_home}" ]]; then
+		_homesize="using the remaining free space"
+	else
+		_homesize="of $_home in size"
+	fi
+
+	read -r _resp?"The following partitions will be created on ${_dev}:
+
+a 500M Fat32 /boot partition on ${_dev}1,
+a swap partition of $_swap in size on ${_dev}2,
+an ext4 /root partition of $_root in size on ${_dev}3
+and an ext4 /home partition $_homesize on ${_dev}4.
+
+Proceed? (Y/n): "
+	case "$_resp" in
+		Y|y)
+			# Proceed with the rest of the script
+			return
+			;;
+		N|n)
+			# Reset config values and run mkpart again.
+			sed -i	-e '/Device/d' \
+				-e '/Swap/d' \
+				-e '/Root/d' \
+				-e '/Home/d' \
+				"$CONF"
+			mkdisk
+			;;
+		*)
+			return
+			;;
+	esac
 }
 
 # Ask for the hostname
