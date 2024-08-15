@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.59 2024/08/15 16:49:24 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.60 2024/08/15 18:08:49 lecorbeau Exp $
 
 set -e
 
@@ -68,9 +68,6 @@ part_dev() {
 			;;
 	esac
 
-	# Create the boot Partition.
-	(echo n; echo p; echo 1; echo 2048; echo +500M; echo w) | fdisk "$_dev"
-	
 	case "$_mode" in
 		bios)	sfdisk -A "$_dev" 1
 			;;
@@ -78,15 +75,38 @@ part_dev() {
 			;;
 	esac
 
+	# New, simpler and seemingly foolproof partitioning method.
+	printf '%s\n' "start=2048, size=500M, type=0x0C
+	size=${_swap}, type=S
+	size=${_root}, type=L
+	size=${_homesize}, type=L" | sfdisk "${_dev}"
+
+	## Older partitioning method. Keeping it here, commented out,
+	# just in case something goes wrong with the new method. Will
+	# remove it once the installer has been  thoroughly tested.
+	#
+	# Create the boot Partition.
+	# (echo n; echo p; echo 1; echo 2048; echo +500M; echo w) | fdisk "$_dev"
+	#
 	# Create the swap partition
-	(echo n; echo p; echo 2; echo ; echo +"$_swap"; echo w) | fdisk "${_dev}"
-	sfdisk --part-type "${_dev}" 2 S
-
+	# (echo n; echo p; echo 2; echo ; echo +"$_swap"; echo w) | fdisk "${_dev}"
+	# sfdisk --part-type "${_dev}" 2 S
+	#
 	# Create the root partition
-	(echo n; echo p; echo 3; echo ; echo +"$_root"; echo w) | fdisk "${_dev}"
-
+	# (echo n; echo p; echo 3; echo ; echo +"$_root"; echo w) | fdisk "${_dev}"
+	#
 	# Create home
-	(echo n; echo p; echo 4; echo ; echo "$_homesize"; echo w) | fdisk "${_dev}"
+	# (echo n; echo p; echo 4; echo ; echo "$_homesize"; echo w) | fdisk "${_dev}"
+	#
+	## End older partitioning method.
+
+	# Set bootable flag on partition 1.
+	case "$_mode" in
+		bios)	sfdisk -A "$_dev" 1
+			;;
+		efi)	sfdisk --part-type "$_dev" 1 U
+			;;
+	esac
 }
 
 # Create filesystems and mount the device
