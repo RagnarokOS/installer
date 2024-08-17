@@ -1,7 +1,9 @@
 #!/bin/ksh
 
+# $Ragnarok: ragnarok-install,v 1.61 2024/08/15 18:11:33 lecorbeau Exp i $
+#
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.61 2024/08/15 18:11:33 lecorbeau Exp $
+# The current version of the script is used for testing purposes only. 
 
 set -e
 
