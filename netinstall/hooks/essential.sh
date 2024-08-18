@@ -1,6 +1,10 @@
 #!/bin/ksh
 
-# $Ragnarok
+# Set the locale and timezone before installing anything after the
+# 'essential:yes' packages. This avoids some useless errors during
+# install.
+
+# $Ragnarok: essential.sh,v 1.3 2024/08/18 18:12:06 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
