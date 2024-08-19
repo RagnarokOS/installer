@@ -1,0 +1,70 @@
+#!/bin/ksh
+
+# $Ragnarok: customize02.sh,v 1.1 2024/08/19 15:57:46 lecorbeau Exp $
+
+. /lib/ragnarok-installer/funcs
+
+CONF=${CONF:-install.conf}
+_locale=$(get_val Locale "$CONF")
+_charset=$(awk '/Locale/ { print $4 }' "$CONF")
+_keymap=$(get_val KB_Layout "$CONF")
+_variant=$(get_val KB_Variant "$CONF")
+_hostname=$(get_val Hostname "$CONF")
+
+# Set up fstab
+msg "Generating fstab entries..."
+genfstab -U "$1" >> "$1"/etc/fstab
+
+# Copy network files
+msg "Setting up network interfaces..."
+
+# copy interfaces files.
+/usr/bin/mkdir -p "$1"/etc/network
+/usr/bin/cp /etc/network/interfaces "$1"/etc/network/
+
+# Copy /etc/network/interfaces.d/ if there's anything in it.
+if [[ -z $(find /etc/network/interfaces.d/ -prune -empty 2>/dev/null) ]]; then
+	/usr/bin/cp -r /etc/network/interfaces.d/ "$1"/etc/network/
+fi
+
+# Set locales
+msg "Setting up locales..."
+chroot "$1" apt-get install locales -y
+chroot "$1" dpkg-reconfigure -f noninteractive locales
+
+# Setting the timezone
+msg "Setting the timezone..."
+chroot "$1" dpkg-reconfigure -f noninteractive tzdata
+
+# Setup the console
+msg "Setting up the console..."
+# Using the setcons script for that in order to keep the installer
+# as small as humanly possible.
+setcons "$_locale" "$_charset"
+chroot "$1" apt-get install console-setup -y
+
+# Set the console font to spleen if the codeset is 'Lat15'
+if grep -q "xfonts" "$CONF"; then
+	case "$CODESET" in
+		Lat15)
+			sed -i 's/FONTFACE/#&/' "$1"/etc/default/console-setup
+			sed -i 's/FONTSIZE/#&/' "$1"/etc/default/console-setup
+			printf '%s\n' 'FONT="spleen-8x16.psfu.gz"' >> "$1"/etc/default/console-setup
+			;;
+	esac
+fi
+
+# Set keymap
+msg "Setting up the keyboard..."
+printf '%s\n' "XKBMODEL=\"pc105\"
+XKBLAYOUT=\"$_keymap\"
+XKBVARIANT=\"\"
+XKBOPTIONS=\"\"
+
+BACKSPACE=\"guess\"" > "$1"/etc/default/keyboard
+chroot "$1" dpkg-reconfigure -f noninteractive keyboard-configuration
+
+# Setup /etc/hosts and /etc/hostname
+msg "Setting up hostname and hosts file..."
+sed -i "s/ragnarok/$_hostname/g" "$1"/etc/hosts "$1"/etc/hostname
+
