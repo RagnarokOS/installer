@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.2 2024/08/19 17:30:31 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.3 2024/08/19 17:39:30 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -26,6 +26,40 @@ set_userpass() {
 	msg "Password for $_resp (will not echo): "
 	chroot "$1" passwd "$_resp"
 }
+
+# Wrapper function around apt-get. The virt set needs to be installed
+# without recommends, so this is how it'll be handled.
+installcmd() {
+	local _set=$1
+
+	case "$1" in
+		virt)	apt-get install --no-install-recommends -y "$_set"
+			;;
+		*)	apt-get install -y "$_set"
+			;;
+	esac
+}
+
+# Install the sets.
+install_sets() {
+	local _sets 
+
+	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
+
+	msg "Installing the sets..."
+	if [[ ${_sets[*]} == none ]]; then
+		msg "No sets selected, skipping..."
+	else
+		for _set in "${_sets[@]}"; do
+			installcmd "ragnarok-${_set}"
+		done
+	fi
+}
+
+## Actual script
+
+# Copy install.conf to the target.
+cp "$CONF" "$1"/
 
 # Set up fstab
 msg "Generating fstab entries..."
@@ -92,3 +126,6 @@ msg "Installing kernels..."
 chroot "$1" apt-get install linux-image-amd64 -y
 chroot "$1" kernupd -d
 chroot "$1" kernupd -i
+
+# Install the sets. Will it work that way? Let's find out.
+chroot "$1" install_sets
