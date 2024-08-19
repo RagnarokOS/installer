@@ -1,15 +1,31 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.1 2024/08/19 15:57:46 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.2 2024/08/19 17:30:31 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
+# Global variables
 CONF=${CONF:-install.conf}
 _locale=$(get_val Locale "$CONF")
 _charset=$(awk '/Locale/ { print $4 }' "$CONF")
 _keymap=$(get_val KB_Layout "$CONF")
 _variant=$(get_val KB_Variant "$CONF")
 _hostname=$(get_val Hostname "$CONF")
+
+# Function to set up default user and passwords
+set_userpass() {
+	local _resp
+
+	msg "Password for the root account (will not echo): "
+	chroot "$1" passwd
+
+	read -r _resp?"Name of default user: "
+	chroot "$1" useradd -m -s /bin/ksh "$_resp"
+	chroot  "$1" usermod -aG wheel,cdrom,floppy,audio,dip,video,plugdev,netdev "$_resp"
+
+	msg "Password for $_resp (will not echo): "
+	chroot "$1" passwd "$_resp"
+}
 
 # Set up fstab
 msg "Generating fstab entries..."
@@ -68,3 +84,11 @@ chroot "$1" dpkg-reconfigure -f noninteractive keyboard-configuration
 msg "Setting up hostname and hosts file..."
 sed -i "s/ragnarok/$_hostname/g" "$1"/etc/hosts "$1"/etc/hostname
 
+# Set root password + default user/pass
+set_userpass "$@"
+
+# Install the kernel
+msg "Installing kernels..."
+chroot "$1" apt-get install linux-image-amd64 -y
+chroot "$1" kernupd -d
+chroot "$1" kernupd -i
