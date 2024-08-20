@@ -1,11 +1,11 @@
 #!/bin/sh
 
-# $Ragnarok: install,v 1.1 2024/08/18 17:21:40 lecorbeau Exp $
+# $Ragnarok: install,v 1.2 2024/08/20 20:00:18 lecorbeau Exp $
 
 VERSION="01"
 FLAVOUR="bookworm"
 
-/usr/bin/mmdebstrap --variant="minbase" \
+/usr/bin/mmdebstrap --skip=check/empty --variant="minbase" \
 	--components="main non-free-firmware" \
 	--include="usrmerge ca-certificates oksh signify-openbsd less wget ed" \
 	--hook-directory=hooks \
