@@ -4,7 +4,7 @@
 # 'essential:yes' packages. This avoids some useless errors during
 # install.
 
-# $Ragnarok: essential.sh,v 1.4 2024/08/20 19:47:30 lecorbeau Exp $
+# $Ragnarok: essential.sh,v 1.5 2024/08/20 19:49:31 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -21,7 +21,7 @@ cp "$CONF" "$1"/
 
 msg "Setting up locales..."
 echo "locales locales/default_environment_locale select $_locale" \
-	| chroot "$1" debconf-set-selection
+	| chroot "$1" debconf-set-selections
 echo "locales locales_to_be_generated multiselect $_locale $_charset" \
 	| chroot "$1" debconf-set-selections
 

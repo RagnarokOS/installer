@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.5 2024/08/20 17:27:15 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.6 2024/08/20 19:48:53 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -58,9 +58,6 @@ install_sets() {
 }
 
 ## Actual script
-
-# Copy install.conf to the target.
-cp "$CONF" "$1"/
 
 # Set up fstab
 msg "Generating fstab entries..."
