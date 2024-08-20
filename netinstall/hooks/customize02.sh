@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.3 2024/08/19 17:39:30 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.4 2024/08/20 17:19:45 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -11,6 +11,7 @@ _charset=$(awk '/Locale/ { print $4 }' "$CONF")
 _keymap=$(get_val KB_Layout "$CONF")
 _variant=$(get_val KB_Variant "$CONF")
 _hostname=$(get_val Hostname "$CONF")
+_dev=$(get_val Device "$CONF")
 
 # Function to set up default user and passwords
 set_userpass() {
@@ -129,3 +130,21 @@ chroot "$1" kernupd -i
 
 # Install the sets. Will it work that way? Let's find out.
 chroot "$1" install_sets
+
+# Install the bootloader.
+msg "Installing the bootloader..."
+if [ -d /mnt/boot/efi ]; then
+	# Install grub-efi
+	chroot "$1" apt-get install grub-efi-amd64
+	chroot "$1" grub-install --target=x86_64-efi \
+		--efi-directory=/boot/efi
+	chroot "$1" update-grub
+else
+	# Install/Configure extlinux
+	chroot "$1" apt-get install extlinux
+	chroot "$1" syslinux-install "${_dev}1"
+fi
+
+# Update the manual pages
+msg "Updating manual pages database..."
+chroot "$1" /usr/sbin/makewhatis /usr/share/man/
