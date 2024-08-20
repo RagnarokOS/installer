@@ -1,11 +1,11 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.6 2024/08/20 19:48:53 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.7 2024/08/20 23:09:19 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
 # Global variables
-CONF=${CONF:-install.conf}
+CONF=${CONF:-/install.conf}
 _locale=$(get_val Locale "$CONF")
 _charset=$(awk '/Locale/ { print $4 }' "$CONF")
 _keymap=$(get_val KB_Layout "$CONF")
