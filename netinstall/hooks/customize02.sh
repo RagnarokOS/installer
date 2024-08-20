@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.4 2024/08/20 17:19:45 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.5 2024/08/20 17:27:15 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -133,7 +133,7 @@ chroot "$1" install_sets
 
 # Install the bootloader.
 msg "Installing the bootloader..."
-if [ -d /mnt/boot/efi ]; then
+if [ -d "$1"/boot/efi ]; then
 	# Install grub-efi
 	chroot "$1" apt-get install grub-efi-amd64
 	chroot "$1" grub-install --target=x86_64-efi \
