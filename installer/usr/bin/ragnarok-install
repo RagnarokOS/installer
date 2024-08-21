@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.63 2024/08/21 14:39:46 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.64 2024/08/21 14:49:13 lecorbeau Exp $
 
 set -e
 
@@ -69,7 +69,15 @@ part_dev() {
 			;;
 	esac
 
-	printf '%s\n' "start=2048, size=500M, type=0x0C
+	# Set the boot partition type depending on boot mode
+	case "$_mode" in
+		bios)	_bootparttype="L"
+			;;
+		efi)	_bootparttype="U"
+			;;
+	esac
+
+	printf '%s\n' "start=2048, size=500M, type=$_bootparttype
 	size=${_swap}, type=S
 	size=${_root}, type=L
 	size=${_homesize}, type=L" | sfdisk "${_dev}"
