@@ -1,8 +1,10 @@
 #!/bin/sh
 
-# $Ragnarok: setup01.sh,v 1.1 2024/08/19 15:15:30 lecorbeau Exp $
+# $Ragnarok: setup01.sh,v 1.2 2024/08/21 18:06:38 lecorbeau Exp $
 
 set -e
+
+cp /install.conf "$1"/
 
 # Copy needed files from the ISO.
 mkdir -p "$1"/etc
