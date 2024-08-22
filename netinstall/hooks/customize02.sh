@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.8 2024/08/21 18:04:35 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.9 2024/08/22 15:54:33 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
@@ -130,7 +130,8 @@ chroot "$1" dpkg-reconfigure -f noninteractive keyboard-configuration
 
 # Setup /etc/hosts and /etc/hostname
 msg "Setting up hostname and hosts file..."
-sed -i "s/ragnarok/$_hostname/g" "$1"/etc/hosts "$1"/etc/hostname
+sed -i "s/ragnarok/$_hostname/g" "$1"/etc/hostname
+sed -i "2i 127.0.1.1\t${_hostname}" "$1"/etc/hosts
 
 # Set root password + default user/pass
 set_userpass "$@"
