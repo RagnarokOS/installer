@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Ragnarok: netinstall,v 1.2 2024/08/20 20:00:18 lecorbeau Exp $
+# $Ragnarok: netinstall,v 1.3 2024/08/24 15:29:25 lecorbeau Exp $
 
 VERSION="01"
 FLAVOUR="bookworm"
@@ -8,7 +8,7 @@ FLAVOUR="bookworm"
 /usr/bin/mmdebstrap --skip=check/empty --variant="minbase" \
 	--components="main non-free-firmware" \
 	--include="usrmerge ca-certificates oksh signify-openbsd less wget ed" \
-	--hook-directory=hooks \
+	--hook-directory=/usr/share/ragnarok-installer/hooks \
 	"${FLAVOUR}" /mnt \
 	"deb https://ragnarokos.github.io/base/deb/ ${VERSION} main" \
 	"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
