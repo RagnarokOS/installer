@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Ragnarok: install,v 1.2 2024/08/20 20:00:18 lecorbeau Exp $
+# $Ragnarok: netinstall,v 1.2 2024/08/20 20:00:18 lecorbeau Exp $
 
 VERSION="01"
 FLAVOUR="bookworm"
