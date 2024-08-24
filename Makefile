@@ -1,9 +1,15 @@
-# Create the rootfs tarball
-# $Ragnarok: Makefile,v 1.4 2024/08/24 15:21:18 lecorbeau Exp $
+# Build ragnarok-install package
+# $Ragnarok: Makefile,v 1.5 2024/08/24 17:37:59 lecorbeau Exp $
 
-all: pkg
+PKG	= ragnarok-installer
+VERSION	= 01
+DESTDIR	= ${PKG}_${VERSION}
+
+all: 
+	mkdir -p ${DESTDIR}
+	cp -r DEBIAN/ ${DESTDIR}
+	cp -r lib/ usr/ ${DESTDIR}
 
 # Create the installer pkg
 pkg:
-	cd installer; \
-		equivs-build ragnarok-installer.pkg 2>&1 | tee ragnarok-installer.build
+	dpkg-deb -b ${DESTDIR}
