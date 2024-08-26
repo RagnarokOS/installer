@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: autoinstall,v 1.3 2024/08/26 15:45:27 lecorbeau Exp $
+# $Ragnarok: autoinstall,v 1.4 2024/08/26 15:55:56 lecorbeau Exp $
 #
 # autoinstall: perform an automatic install based on answers given
 # in the /install.conf file.
@@ -143,6 +143,19 @@ mk_part() {
 	esac
 }
 
+# Fetch the sets from http mirror.
+get_set() {
+	local _file=$1
+
+	msg "Fetching ${_file}..."
+	unpriv -f "${TMP}/${_file}" "wget -q --show-progress -P ${TMP} -O ${_file} ${URL}/${_file}"
+
+	# Make sure /mnt/var/db/ragnarok/sets exists
+	mkdir -p /mnt/var/db/ragnarok/sets
+
+	mv "${TMP}/${_file}" /mnt/var/db/ragnarok/sets/
+}
+
 # Fetch the sets from the net.
 install_from_http() {
 	local _sets
@@ -157,7 +170,7 @@ install_from_http() {
 		msg "No sets selected, skipping..."
 	else
 		for _set in "${_sets[@]}"; do
-			get_set "ragnarok-${_set}"
+			get_set "${_set}${VERSION}.tgz"
 		done
 	fi
 }
