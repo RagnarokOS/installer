@@ -1,13 +1,11 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.9 2024/08/22 15:54:33 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.10 2024/08/26 17:37:26 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
 # Global variables
 CONF=${CONF:-/install.conf}
-_locale=$(get_val Locale "$CONF")
-_charset=$(awk '/Locale/ { print $4 }' "$CONF")
 _tz=$(get_val Timezone "$CONF")
 _area=${_tz%%/*}
 _zone=${_tz##/*}
@@ -15,6 +13,49 @@ _keymap=$(get_val KB_Layout "$CONF")
 _variant=$(get_val KB_Variant "$CONF")
 _hostname=$(get_val Hostname "$CONF")
 _dev=$(get_val Device "$CONF")
+
+# Set locales and console.
+set_locale() {
+	local _resp _locale _charset _keymap
+	
+	read -r _resp?"Enter the locale for this system. e.g. en_US.UTF-8 UTF-8. (Type 'l' for a list of supported locales): "
+
+	_locale=${_resp%% *}
+	_charset=${_resp##* }
+	case "$_resp" in
+		l)
+			less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/locales.list; set_locale
+			;;
+		*)
+			echo "locales locales/default_environment_locale select $_locale" \
+				| chroot "$1" debconf-set-selections
+			echo "locales locales/locales_to_be_generated multiselect $_locale $_charset" \
+				| chroot "$1" debconf-set-selections
+			chroot "$1" apt-get install locales -y
+			# Remove locale.gen. It'll be recreated after dpkg-reconfigure
+			rm "$1"/etc/locale.gen
+			chroot "$1" dpkg-reconfigure -f noninteractive locales
+			;;
+	esac
+
+	# Setup the console
+	msg "Setting up the console..."
+	# Using the setcons script for that in order to keep the installer
+	# as small as humanly possible.
+	chroot "$1" setcons "$_locale" "$_charset"
+	chroot "$1" apt-get install console-setup -y
+
+	# Set the console font to spleen if the codeset is 'Lat15'
+	if grep -q "xfonts" "$CONF"; then
+		case "$CODESET" in
+			Lat15)
+				sed -i 's/FONTFACE/#&/' "$1"/etc/default/console-setup
+				sed -i 's/FONTSIZE/#&/' "$1"/etc/default/console-setup
+				printf '%s\n' 'FONT="spleen-8x16.psfu.gz"' >> "$1"/etc/default/console-setup
+				;;
+		esac
+	fi
+}
 
 # Function to set up default user and passwords
 set_userpass() {
