@@ -1,0 +1,162 @@
+#!/bin/ksh
+
+# $Ragnarok: autoinstall,v 1.1 2024/08/26 15:36:26 lecorbeau Exp $
+#
+# autoinstall: perform an automatic install based on answers given
+# in the /install.conf file.
+
+. /usr/lib/ragnarok-installer/funcs
+
+CONF=${CONF:-install.conf}
+TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
+MIRROR="https://github.com/RagnarokOS/distrib/releases/download/"
+VERSION="01"
+URL="${MIRROR}${VERSION}"
+SETS_LOC=$(get_val Set_location "$CONF")
+
+# Never download stuff off the internet as the root user.
+# I take no credit for this function. All credit goes to
+# Antoine Jacoutot, who wrote OpenBSD's syspatch(1).
+unpriv() {
+	local _file=$2 _ret=0 _user=_apt
+
+	if [[ $1 == -f && -n ${_file} ]]; then
+		# shellcheck disable=SC2188
+		>${_file}
+		chown "${_user}" "${_file}"
+		chmod 0711 "${TMP}"
+		shift 2
+	fi
+	(($# >= 1))
+
+	su -s /bin/sh ${_user} -c "$@" || _ret=$?
+
+	[[ -n ${_file} ]] && chown root "${_file}"
+
+	return ${_ret}
+}
+
+# Actually partition the device
+part_dev() {
+	local _dev _mode _root _home _swap
+
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+	_root=$(get_val Root "$CONF")
+	_home=$(get_val Home "$CONF")
+	_swap=$(get_val Swap "$CONF")
+
+	# Home may be left empty to use the remaining space, so
+	# handle it properly.
+	if [[ -z $_home ]]; then
+		_homsesize="+"
+	else
+		_homesize="${_home}"
+	fi
+
+	# Wipe device
+	sfdisk --delete "$_dev"
+
+	# Set the proper part table (mbr for bios, GPT for EFI).
+	case "$_mode" in
+		bios)
+			(echo o) | fdisk "$_dev"
+			;;
+		efi)
+			(echo g) | fdisk "$_dev"
+			;;
+	esac
+
+	# Set the boot partition type depending on boot mode
+	case "$_mode" in
+		bios)	_bootparttype="L"
+			;;
+		efi)	_bootparttype="U"
+			;;
+	esac
+
+	printf '%s\n' "start=2048, size=500M, type=$_bootparttype
+	size=${_swap}, type=S
+	size=${_root}, type=L
+	size=${_homesize}, type=L" | sfdisk "${_dev}"
+
+	# Set bootable flag on partition 1.
+	case "$_mode" in
+		bios)	sfdisk -A "$_dev" 1
+			;;
+		efi)	sfdisk --part-type "$_dev" 1 U
+			;;
+	esac
+}
+
+# Create filesystems and mount the device
+mount_dev() {
+	local _dev _mode
+
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+
+	case "$_mode" in
+		bios)
+			mkfs.ext4 "${_dev}1"
+			;;
+		efi)
+			mkfs.vfat -F 32 "${_dev}1"
+			;;
+	esac
+	mkswap "${_dev}2"
+	# mkfs will ask to proceed anyway unless -F is used.
+	mkfs.ext4 -F "${_dev}3"
+	mkfs.ext4 -F "${_dev}4"
+
+	swapon "${_dev}2"
+	mount -t ext4 -o errors=remount-ro "${_dev}3" /mnt
+	mkdir -p /mnt/{boot,home}
+	mount -t ext4 -o defaults "${_dev}4" /mnt/home
+	case "$_mode" in
+		bios)
+			mount -t ext4 -o noexec,nosuid,nodev "${_dev}1" /mnt/boot
+			;;
+		efi)
+			mkdir -p /mnt/boot/efi
+			mount -t vfat -o umask=0077,noexec,nosuid,nodev "${_dev}1" /mnt/boot/efi
+			;;
+	esac
+}
+
+# Wrapper function. Ask if the installer should proceed with partitioning the device.
+mk_part() {
+	local _dev _resp
+
+	_dev=$(get_val Device "$CONF")
+
+	read -r _resp?"The following device will be formatted: ${_dev}. All data will be erased. Proceed? (Y/n): "
+	case "$_resp" in
+		N|n)
+			msg "Exiting installer. Start again..."
+			exit 1
+			;;
+		Y|y)
+			part_dev
+			mount_dev
+			;;
+	esac
+}
+
+# Function to install the base system
+do_install() {
+	case "$1" in
+		disk)
+			install_from_disk
+			;;
+		http)
+			install_from_http
+			;;
+		none)
+			install_from_scratch
+			;;
+	esac
+}
+
+# Main
+do_install "$SETS_LOC"
