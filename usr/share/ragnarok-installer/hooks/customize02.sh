@@ -1,14 +1,11 @@
 #!/bin/ksh
 
-# $Ragnarok: customize02.sh,v 1.10 2024/08/26 17:37:26 lecorbeau Exp $
+# $Ragnarok: customize02.sh,v 1.11 2024/08/26 18:01:05 lecorbeau Exp $
 
 . /lib/ragnarok-installer/funcs
 
 # Global variables
 CONF=${CONF:-/install.conf}
-_tz=$(get_val Timezone "$CONF")
-_area=${_tz%%/*}
-_zone=${_tz##/*}
 _keymap=$(get_val KB_Layout "$CONF")
 _variant=$(get_val KB_Variant "$CONF")
 _hostname=$(get_val Hostname "$CONF")
@@ -55,6 +52,36 @@ set_locale() {
 				;;
 		esac
 	fi
+}
+
+# Set the timezone
+set_tz() {
+	local _resp _area _zone
+
+	read -r _resp?"Enter the time zone for this system. e.g. America/New_York. ('l' for a list of supported timezones): "
+	
+	_area=${_resp%%/*}
+	_zone=${_resp##/*}
+
+	case "$_resp" in
+
+		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/tz.list; ask_tz "$@"
+			;;
+		*)
+			msg "Setting the timezone..."
+			echo "tzdata tzdata/Areas select $_area" \ 
+				| chroot "$1" debconf-set-selections
+			echo "tzdata tzdata/Zones/$_area select $_zone" \ 
+				| chroot "$1" debconf-set-selections
+			echo 'tzdata tzdata/Zones/Etc select UTC' \ 
+			       | chroot "$1" debconf-set-selections
+			# This has to be done or else dpkg-reconfigure insists on using Etc
+			# as the default timezone for whatever stupid reason.
+			echo "${_area}/${_zone}" > "$1"/etc/timezone
+			chroot "$1" ln -sf /usr/share/zoneinfo/"${_area}"/"${_zone}" /etc/localtime
+			chroot "$1" dpkg-reconfigure -f noninteractive tzdata
+			;;
+	esac
 }
 
 # Function to set up default user and passwords
