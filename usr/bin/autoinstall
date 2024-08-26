@@ -1,6 +1,6 @@
 #!/bin/ksh
 
-# $Ragnarok: autoinstall,v 1.1 2024/08/26 15:36:26 lecorbeau Exp $
+# $Ragnarok: autoinstall,v 1.3 2024/08/26 15:45:27 lecorbeau Exp $
 #
 # autoinstall: perform an automatic install based on answers given
 # in the /install.conf file.
@@ -141,6 +141,36 @@ mk_part() {
 			mount_dev
 			;;
 	esac
+}
+
+# Fetch the sets from the net.
+install_from_http() {
+	local _sets
+
+	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
+
+	msg "Installing base..."
+	get_set base"${VERSION}".tgz
+
+	msg "Installing the sets..."
+	if [[ ${_sets[*]} == none ]]; then
+		msg "No sets selected, skipping..."
+	else
+		for _set in "${_sets[@]}"; do
+			get_set "ragnarok-${_set}"
+		done
+	fi
+}
+
+install_from_scratch() {
+	/usr/bin/mmdebstrap --skip=check/empty --variant="minbase" \
+		--components="main non-free-firmware" \
+		--include="usrmerge ca-certificates oksh signify-openbsd less wget ed" \
+		"${FLAVOUR}" /mnt \
+		"deb https://ragnarokos.github.io/base/deb/ ${VERSION} main" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
+		"deb http://security.debian.org/ ${FLAVOUR}-security main non-free-firmware" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR}-updates main non-free-firmware"
 }
 
 # Function to install the base system
