@@ -1,9 +1,86 @@
 #!/bin/sh
 
-# $Ragnarok: netinstall,v 1.3 2024/08/24 15:29:25 lecorbeau Exp $
+# $Ragnarok: netinstall,v 1.4 2024/08/27 19:49:00 lecorbeau Exp $
 
 VERSION="01"
 FLAVOUR="bookworm"
+
+## Functions
+
+# Set locales and console.
+set_locale() {
+	local _resp _locale _charset _keymap
+	
+	read -r _resp?"Enter the locale for this system. e.g. en_US.UTF-8 UTF-8. (Type 'l' for a list of supported locales): "
+
+	_locale=${_resp%% *}
+	_charset=${_resp##* }
+	case "$_resp" in
+		l)
+			less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/locales.list; set_locale
+			;;
+		*)
+			echo "locales locales/default_environment_locale select $_locale" \
+				| chroot "$1" debconf-set-selections
+			echo "locales locales/locales_to_be_generated multiselect $_locale $_charset" \
+				| chroot "$1" debconf-set-selections
+			chroot "$1" apt-get install locales -y
+			# Remove locale.gen. It'll be recreated after dpkg-reconfigure
+			rm "$1"/etc/locale.gen
+			chroot "$1" dpkg-reconfigure -f noninteractive locales
+			;;
+	esac
+
+	# Setup the console
+	msg "Setting up the console..."
+	# Using the setcons script for that in order to keep the installer
+	# as small as humanly possible.
+	chroot "$1" setcons "$_locale" "$_charset"
+	chroot "$1" apt-get install console-setup -y
+
+	# Set the console font to spleen if the codeset is 'Lat15'
+	if grep -q "xfonts" "$CONF"; then
+		case "$CODESET" in
+			Lat15)
+				sed -i 's/FONTFACE/#&/' "$1"/etc/default/console-setup
+				sed -i 's/FONTSIZE/#&/' "$1"/etc/default/console-setup
+				printf '%s\n' 'FONT="spleen-8x16.psfu.gz"' >> "$1"/etc/default/console-setup
+				;;
+		esac
+	fi
+}
+
+# Set the timezone
+set_tz() {
+	local _resp _area _zone
+
+	read -r _resp?"Enter the time zone for this system. e.g. America/New_York. ('l' for a list of supported timezones): "
+	
+	_area=${_resp%%/*}
+	_zone=${_resp##/*}
+
+	case "$_resp" in
+
+		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " /usr/share/ragnarok-installer/lists/tz.list; ask_tz "$@"
+			;;
+		*)
+			msg "Setting the timezone..."
+			echo "tzdata tzdata/Areas select $_area" \ 
+				| chroot "$1" debconf-set-selections
+			echo "tzdata tzdata/Zones/$_area select $_zone" \ 
+				| chroot "$1" debconf-set-selections
+			echo 'tzdata tzdata/Zones/Etc select UTC' \ 
+			       | chroot "$1" debconf-set-selections
+			# This has to be done or else dpkg-reconfigure insists on using Etc
+			# as the default timezone for whatever stupid reason.
+			echo "${_area}/${_zone}" > "$1"/etc/timezone
+			chroot "$1" ln -sf /usr/share/zoneinfo/"${_area}"/"${_zone}" /etc/localtime
+			chroot "$1" dpkg-reconfigure -f noninteractive tzdata
+			;;
+	esac
+}
+
+
 
 /usr/bin/mmdebstrap --skip=check/empty --variant="minbase" \
 	--components="main non-free-firmware" \
