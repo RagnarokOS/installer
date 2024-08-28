@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.65 2024/08/21 15:00:14 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.66 2024/08/28 15:40:03 lecorbeau Exp $
 
 set -e
 
@@ -36,6 +36,32 @@ unpriv() {
 	[[ -n ${_file} ]] && chown root "${_file}"
 
 	return ${_ret}
+}
+
+## Funcs to ask questions (these may end up being moved to
+## lib/ragnarok-install/funcs down the line.
+
+# Ask conf question and store _answer as a variable.
+ask() {
+	local _q=$1 _resp
+
+	read -r _resp?"$_q "
+	_answer="$_resp"
+}
+
+# For some questions, lists of available choices need to be provided.
+# $1 is the question
+# $2 is the list
+ask_q() {
+	local _resp _q=$1 _list=$2
+
+	read -r _resp?"$_q "
+	case "$_resp" in
+		l)	less --prompt="/ to search, j/k to navigate, q to quit, h for help " .local/src/ragnarok/installer/usr/share/ragnarok-installer/lists/"$_list".list; ask_q "$@"
+			;;
+		*)	_answer="$_resp"
+			;;
+	esac
 }
 
 # Actually partition the device
