@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.67 2024/08/28 15:44:15 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.68 2024/08/28 15:46:22 lecorbeau Exp $
 
 set -e
 
@@ -195,13 +195,6 @@ mk_part() {
 	esac
 }
 
-# run mkconf unless arg 1 is -a/--auto
-run_mkconf() {
-	if [[ -z $ARG ]]; then
-		mkconf
-	fi
-}
-
 # Run the appropriate installer script.
 do_install() {
 	# We'll handle the other types of install (offline, etc...) later.
@@ -236,7 +229,6 @@ finish() {
 }
 
 main() {
-	run_mkconf
 	part_dev
 	mount_dev
 	do_install
