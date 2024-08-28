@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.66 2024/08/28 15:40:03 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.67 2024/08/28 15:44:15 lecorbeau Exp $
 
 set -e
 
@@ -62,6 +62,30 @@ ask_q() {
 		*)	_answer="$_resp"
 			;;
 	esac
+}
+
+# Ask for password.
+# Much like unpriv(), I take no credit for ask_pass/ask_password. All
+# credits go to the creator(s) of the OpenBSD installer.
+ask_pass() {
+	stty -echo
+	IFS= read -r _resp?"$1 "
+	stty echo
+	echo
+}
+
+ask_password() {
+	local _q=$1 _resp
+
+	while :; do
+		ask_pass "$_q (will not echo)"
+		_password=$_resp
+
+		ask_pass "$_q (again)"
+		[[ $_resp == "$_password" ]] && break
+
+		echo "Passwords don't match, try again."
+	done
 }
 
 # Actually partition the device
