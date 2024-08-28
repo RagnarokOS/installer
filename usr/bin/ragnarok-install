@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.68 2024/08/28 15:46:22 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.69 2024/08/28 16:00:34 lecorbeau Exp $
 
 set -e
 
@@ -86,6 +86,26 @@ ask_password() {
 
 		echo "Passwords don't match, try again."
 	done
+}
+
+# Configure the device
+dev_conf() {
+	msg "Listing available devices..."
+	echo
+	lsblk
+	echo
+	ask "Which device should the system be installed on? (e.g. /dev/sdX): "
+	_dev="$_answer"
+	echo
+	ask "Size of the swap partition? (enter num + G, e.g. 8G): "
+	_swap="$_answer"
+	echo
+	ask "Size of root (/)? (enter num + G, e.g. 30G): "
+	_root="$_answer"
+	echo
+	ask "Size of /home? (enter num + G, or leave blank to use remainder of space on ${_dev}: "
+	_home="$_answer"
+	echo
 }
 
 # Actually partition the device
