@@ -1,14 +1,13 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.72 2024/08/29 14:36:51 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.73 2024/08/29 15:26:52 lecorbeau Exp $
 
 set -e
 
 . /usr/lib/ragnarok-installer/funcs
 
 CONF=${CONF:-install.conf}
-ARG="$1"
 INSTALLTYPE=${INSTALLTYPE:-netinstall}
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
@@ -140,8 +139,37 @@ dev_conf() {
 	fi
 }
 
-# Ask all other config questions
+# Ask all other config questions.
 do_conf() {
+	ask_q "Enter the timezine for this system, e.g. America/New_York. (Type l for a list of supported timezones): " tz
+	_timezone="$_answer"
+	echo
+	ask_q "Enter the locale for this system, e.g. en_US.UTF-8 UTF-8. (Type l for a list of supported locales): " locales
+	_locale="$_answer"
+	echo
+	ask_q "Enter the keymap for this system, e.g. us. (Type l for a list of supported keymaps): " xkblayout
+	_kblayout="$_answer"
+	echo
+	ask "Enter the hostname for this machine: "
+	_hostname="$_answer"
+	echo
+	ask_password "Enter the password for the root account: "
+	_rootpass="$_password"
+	ask "Setup a default user? (Y/n): "
+	echo
+	case "$_answer" in
+		Y|y)
+			ask "Name of default user: "
+			_username="$_answer"
+			echo
+			ask_password "Enter the password for ${_username}: "
+			_userpass="$_password"
+			;;
+		*)
+			msg "Skipping user setup..."
+			;;
+	esac
+	echo
 }
 
 ### Funcs to actually install the system.
