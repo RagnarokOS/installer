@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.73 2024/08/29 15:26:52 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.74 2024/08/30 17:59:39 lecorbeau Exp $
 
 set -e
 
@@ -260,23 +260,6 @@ mk_part() {
 	esac
 }
 
-# Run the appropriate installer script.
-do_install() {
-	# We'll handle the other types of install (offline, etc...) later.
-	case "$INSTALLTYPE" in
-		netinstall)
-			netinstall/install
-			;;
-		offline)
-			msg "Not supported yet..."
-			do_install
-			;;
-		*)
-			netinstall/install
-			;;
-	esac
-}
-
 # Finishing touch
 finish() {
 	local _resp
@@ -296,7 +279,6 @@ finish() {
 main() {
 	part_dev
 	mount_dev
-	do_install
 	finish
 }
 
