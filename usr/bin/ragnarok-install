@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.74 2024/08/30 17:59:39 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.75 2024/08/31 17:41:53 lecorbeau Exp $
 
 set -e
 
@@ -63,7 +63,8 @@ ask_q() {
 	esac
 }
 
-# Ask for password.
+# Ask for password. We ask for the passwords and username here because
+# we're not going to store passwords unencrypted in install.conf.
 # Much like unpriv(), I take no credit for ask_pass/ask_password. All
 # credits go to the creator(s) of the OpenBSD installer.
 ask_pass() {
@@ -87,8 +88,27 @@ ask_password() {
 	done
 }
 
+# Now ask the questions
+user_setup() {
+	local _resp
+
+	ask_password "Password for the root account?"
+	_rootpass="$_password"
+
+	read -r _Yn?"Setup a default user? [Y/n]: "
+	case "$_Yn" in
+		n|N)	return
+			;;
+		*)	ask "Name of the default user? "
+			_username="$_answer"
+			ask_password "Password for ${_username}"
+			_userpass="$_password"
+			;;
+	esac
+}
+
 # Configure the device
-dev_conf() {
+part_dev() {
 	local _resp _homesize
 
 	msg "Listing available devices..."
@@ -111,9 +131,9 @@ dev_conf() {
 	echo
 
 	if [[ -z $_home ]]; then
-		_homesize="using the remaining free space"
+		_homesiz="using the remaining free space"
 	else
-		_homesize="$_home"
+		_homesiz="$_home"
 	fi
 
 	case "$_mode" in
@@ -128,7 +148,7 @@ dev_conf() {
 	a 500M $_bootparttype /boot partition on ${_dev}1,
 	a swap partition of $_swap in size on ${_dev}2,
 	an ext4 /root partition of $_root in size on ${_dev}3
-	and an ext4 /home partition $_homesize on ${_dev}4.
+	and an ext4 /home partition $_homesiz on ${_dev}4.
 
 	proceed? (Y/n): "
 
@@ -137,39 +157,41 @@ dev_conf() {
 		msg "restarting..."
 		dev_conf
 	fi
-}
 
-# Ask all other config questions.
-do_conf() {
-	ask_q "Enter the timezine for this system, e.g. America/New_York. (Type l for a list of supported timezones): " tz
-	_timezone="$_answer"
-	echo
-	ask_q "Enter the locale for this system, e.g. en_US.UTF-8 UTF-8. (Type l for a list of supported locales): " locales
-	_locale="$_answer"
-	echo
-	ask_q "Enter the keymap for this system, e.g. us. (Type l for a list of supported keymaps): " xkblayout
-	_kblayout="$_answer"
-	echo
-	ask "Enter the hostname for this machine: "
-	_hostname="$_answer"
-	echo
-	ask_password "Enter the password for the root account: "
-	_rootpass="$_password"
-	ask "Setup a default user? (Y/n): "
-	echo
-	case "$_answer" in
-		Y|y)
-			ask "Name of default user: "
-			_username="$_answer"
-			echo
-			ask_password "Enter the password for ${_username}: "
-			_userpass="$_password"
+	# Wipe device
+	sfdisk --delete "$_dev"
+
+	# Set the proper part table (mbr for bios, GPT for EFI).
+	case "$_mode" in
+		bios)
+			(echo o) | fdisk "$_dev"
 			;;
-		*)
-			msg "Skipping user setup..."
+		efi)
+			(echo g) | fdisk "$_dev"
 			;;
 	esac
-	echo
+
+	# Home may be left empty to use the remaining space, so
+	# handle it properly.
+	if [[ -z $_home ]]; then
+		_homsesize="+"
+	else
+		_homesize="${_home}"
+	fi
+
+	# Partition device
+	printf '%s\n' "start=2048, size=500M, type=0x0C
+	size=${_swap}, type=S
+	size=${_root}, type=L
+	size=${_homesize}, type=L" | sfdisk "${_dev}"
+
+	# Set bootable flag on partition 1.
+	case "$_mode" in
+		bios)	sfdisk -A "$_dev" 1
+			;;
+		efi)	sfdisk --part-type "$_dev" 1 U
+			;;
+	esac
 }
 
 ### Funcs to actually install the system.
