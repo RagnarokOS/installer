@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.15 2024/08/14 16:32:17 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.16 2024/09/01 16:50:49 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -51,23 +51,33 @@ mkdisk() {
 
 	lsblk
 	echo
-	read -r _resp?"Which disk should the system be installed on? (enter device, e.g. /dev/sda, or 's' to skip disk partitioning): "
-
-	# If user typed 's', skip this step.
-	if [[ $_resp == s ]]; then
-		return
-	fi
-
+	read -r _resp?"Which disk should the system be installed on? (enter device, e.g. /dev/sdX): "
 	set_val Device "$_resp" "$CONF"
+	read -r _resp?"Enter the boot mode for this system ('efi' or 'bios'): "
+	set_val Bootmode "$_resp" "$CONF"
 
 	_dev=$(get_val Device "$CONF")
-	read -r _resp?"The installer will create partitions on ${_dev}. Warning: all data will be erased. Proceed? (Y/n): "
+
+	read -r _resp?"The installer will create partitions on ${_dev}. Warning: all data will be erased. Proceed? (Y/n/s/?): "
 	case "$_resp" in
 		Y|y)
 			ask_part
 			;;
 		N|n)
-			sed -i '/Device/d' "$CONF" 
+			sed -i '/Device/d' "$CONF"
+			sed -i '/Bootmode/d' "$CONF"
+			mkdisk
+			;;
+		s|S)	# Skip if 's' or 'S'
+			return
+			;;
+		?)
+			msg "Y/y = proceed.
+N/n = restart (e.g. if the wrong disk was selected).
+S/s = skip (if the device was partitioned beforehand).
+?   = show this help message then restart." | less -c
+			sed -i '/Device/d' "$CONF"
+			sed -i '/Bootmode/d' "$CONF"
 			mkdisk
 			;;
 		*)
@@ -75,9 +85,17 @@ mkdisk() {
 			;;
 	esac
 
+	_mode=$(get_val Bootmode "$CONF")
 	_swap=$(get_val Swap "$CONF")
 	_root=$(get_val Root "$CONF")
 	_home=$(get_val Home "$CONF")
+
+	case "$_mode" in
+		bios)	_boottype="ext4"
+			;;
+		efi)	_boottype="Fat32"
+			;;
+	esac
 
 	if [[ -z "${_home}" ]]; then
 		_homesize="using the remaining free space"
@@ -87,7 +105,7 @@ mkdisk() {
 
 	read -r _resp?"The following partitions will be created on ${_dev}:
 
-a 500M Fat32 /boot partition on ${_dev}1,
+a 500M $_boottype /boot partition on ${_dev}1,
 a swap partition of $_swap in size on ${_dev}2,
 an ext4 /root partition of $_root in size on ${_dev}3
 and an ext4 /home partition $_homesize on ${_dev}4.
