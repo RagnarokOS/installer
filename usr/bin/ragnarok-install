@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.79 2024/09/03 17:21:32 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.80 2024/09/03 17:35:07 lecorbeau Exp $
 
 set -e
 
@@ -300,6 +300,38 @@ set_cons() {
 	fi
 }
 
+# Set keymap
+set_kb() {
+	local _keymap _variant
+
+	_keymap=$(get_val KB_Layout "$CONF")
+	_variant=$(get_val KB_Variant "$CONF")
+
+	msg "Setting up the keyboard..."
+	echo "keyboard-configuration keyboard-configuration/model select Generic 105-key PC" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/layoutcode string $_keymap" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/variant select $_variant" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/xkb-keymap select $_keymap" \
+		| arch-chroot /mnt debconf-set-selections
+	echo "keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true" \
+		| arch-chroot /mnt debconf-set-selections
+
+	printf '%s\n' "XKBMODEL=\"pc105\"
+XKBLAYOUT=\"$_keymap\"
+XKBVARIANT=\"\"
+XKBOPTIONS=\"\"
+
+BACKSPACE=\"guess\""> /mnt/etc/default/keyboard
+	arch-chroot /mnt dpkg-reconfigure -f noninteractive keyboard-configuration
+}
+
+set_rootpass() {
+	echo "root:$_rootpass" | arch-chroot /mnt chpasswd
+}
+
 # Finishing touch
 finish() {
 	local _resp
@@ -328,6 +360,8 @@ main() {
 	set_tz
 	set_locale
 	set_cons
+	set_kb
+	set_rootpass
 	finish
 }
 
