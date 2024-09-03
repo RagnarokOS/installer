@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.75 2024/08/31 17:41:53 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.76 2024/09/03 15:13:52 lecorbeau Exp $
 
 set -e
 
@@ -107,56 +107,17 @@ user_setup() {
 	esac
 }
 
-# Configure the device
+### Funcs to actually install the system.
+
+# Partition the device
 part_dev() {
-	local _resp _homesize
+	local _dev _mode _swap _root _home _homesize _bootparttype
 
-	msg "Listing available devices..."
-	echo
-	lsblk
-	echo
-	ask "Which device should the system be installed on? (e.g. /dev/sdX): "
-	_dev="$_answer"
-	echo
-	ask "Should the system boot in efi or legacy mode? "
-	_mode="$_answer"
-	ask "Size of the swap partition? (enter num + G, e.g. 8G): "
-	_swap="$_answer"
-	echo
-	ask "Size of root (/)? (enter num + G, e.g. 30G): "
-	_root="$_answer"
-	echo
-	ask "Size of /home? (enter num + G, or leave blank to use remainder of space on ${_dev}: "
-	_home="$_answer"
-	echo
-
-	if [[ -z $_home ]]; then
-		_homesiz="using the remaining free space"
-	else
-		_homesiz="$_home"
-	fi
-
-	case "$_mode" in
-		efi)	_bootparttype="fat32"
-			;;
-		bios)	_bootparttype="ext4"
-			;;
-	esac
-
-	read -r _resp?"The following partitions will be created on ${_dev}:
-
-	a 500M $_bootparttype /boot partition on ${_dev}1,
-	a swap partition of $_swap in size on ${_dev}2,
-	an ext4 /root partition of $_root in size on ${_dev}3
-	and an ext4 /home partition $_homesiz on ${_dev}4.
-
-	proceed? (Y/n): "
-
-	# Restart if N/n
-	if [[ $_resp == N ]] || [[ $_resp == n ]]; then
-		msg "restarting..."
-		dev_conf
-	fi
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+	_swap=$(get_val Swap "$CONF")
+	_root=$(get_val Root "$CONF")
+	_home=$(get_val Home "$CONF")
 
 	# Wipe device
 	sfdisk --delete "$_dev"
@@ -165,9 +126,11 @@ part_dev() {
 	case "$_mode" in
 		bios)
 			(echo o) | fdisk "$_dev"
+			_bootparttype="L"
 			;;
 		efi)
 			(echo g) | fdisk "$_dev"
+			_bootparttype="U"
 			;;
 	esac
 
@@ -178,46 +141,6 @@ part_dev() {
 	else
 		_homesize="${_home}"
 	fi
-
-	# Partition device
-	printf '%s\n' "start=2048, size=500M, type=0x0C
-	size=${_swap}, type=S
-	size=${_root}, type=L
-	size=${_homesize}, type=L" | sfdisk "${_dev}"
-
-	# Set bootable flag on partition 1.
-	case "$_mode" in
-		bios)	sfdisk -A "$_dev" 1
-			;;
-		efi)	sfdisk --part-type "$_dev" 1 U
-			;;
-	esac
-}
-
-### Funcs to actually install the system.
-
-# Actually partition the device
-part_dev() {
-	# Wipe device
-	sfdisk --delete "$_dev"
-
-	# Set the proper part table (mbr for bios, GPT for EFI).
-	case "$_mode" in
-		bios)
-			(echo o) | fdisk "$_dev"
-			;;
-		efi)
-			(echo g) | fdisk "$_dev"
-			;;
-	esac
-
-	# Set the boot partition type depending on boot mode
-	case "$_mode" in
-		bios)	_bootparttype="L"
-			;;
-		efi)	_bootparttype="U"
-			;;
-	esac
 
 	printf '%s\n' "start=2048, size=500M, type=$_bootparttype
 	size=${_swap}, type=S
@@ -235,6 +158,11 @@ part_dev() {
 
 # Create filesystems and mount the device
 mount_dev() {
+	local _dev _mode
+
+	_dev=$(get_val Device "$CONF")
+	_mode=$(get_val Bootmode "$CONF")
+
 	case "$_mode" in
 		bios)
 			mkfs.ext4 "${_dev}1"
@@ -259,25 +187,6 @@ mount_dev() {
 		efi)
 			mkdir -p /mnt/boot/efi
 			mount -t vfat -o umask=0077,noexec,nosuid,nodev "${_dev}1" /mnt/boot/efi
-			;;
-	esac
-}
-
-# Wrapper function. Ask if the installer should proceed with partitioning the device.
-mk_part() {
-	local _dev _resp
-
-	_dev=$(get_val Device "$CONF")
-
-	read -r _resp?"The following device will be formatted: ${_dev}. All data will be erased. Proceed? (Y/n): "
-	case "$_resp" in
-		N|n)
-			msg "Exiting installer. Start again..."
-			exit 1
-			;;
-		Y|y)
-			part_dev
-			mount_dev
 			;;
 	esac
 }
