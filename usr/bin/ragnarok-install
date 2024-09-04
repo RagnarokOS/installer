@@ -1,12 +1,13 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.84 2024/09/04 17:11:40 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.85 2024/09/04 18:11:52 lecorbeau Exp $
 
 set -e
 
 . /usr/lib/ragnarok-installer/funcs
 
+ARG=$1
 CONF=${CONF:-install.conf}
 INSTALLTYPE=${INSTALLTYPE:-netinstall}
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
@@ -90,7 +91,7 @@ ask_password() {
 
 # Now ask the questions
 user_setup() {
-	local _resp
+	local _resp _Yn
 
 	ask_password "Password for the root account?"
 	_rootpass="$_password"
@@ -242,11 +243,11 @@ set_tz() {
 	_zone=${_tz##*/}
 
 	msg "Setting the timezone..."
-	echo "tzdata tzdata/Areas select $_area" \ 
+	echo "tzdata tzdata/Areas select $_area" \
 		| arch-chroot /mnt debconf-set-selections
-	echo "tzdata tzdata/Zones/$_area select $_zone" \ 
+	echo "tzdata tzdata/Zones/$_area select $_zone" \
 		| arch-chroot /mnt debconf-set-selections
-	echo 'tzdata tzdata/Zones/Etc select UTC' \ 
+	echo 'tzdata tzdata/Zones/Etc select UTC' \
 	       | arch-chroot /mnt debconf-set-selections
 	# This has to be done or else dpkg-reconfigure insists on using Etc
 	# as the default timezone for whatever stupid reason.
@@ -408,6 +409,14 @@ set_bootloader() {
 	fi
 }
 
+# Don't run user_setup and mkconf if '-a' is given as arg.
+run_conf() {
+	if [[ $ARG != "-a" ]]; then
+		user_setup
+		mkconf
+	fi
+}
+
 # Finishing touch
 finish() {
 	local _resp
@@ -425,7 +434,7 @@ finish() {
 }
 
 main() {
-	user_setup
+	run_conf
 	part_dev
 	mount_dev
 	get_tarball
