@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.82 2024/09/04 15:40:38 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.83 2024/09/04 16:05:10 lecorbeau Exp $
 
 set -e
 
@@ -383,6 +383,28 @@ install_sets() {
 
 }
 
+# Setup the bootloader. Grub for EFI, extlinux for bios/legacy.
+set_bootloader() {
+	local _resp
+
+	msg "Installing the grub bootloader..."
+	if [ -d /mnt/boot/efi ]; then
+		# Install grub-efi
+		arch-hroot /mnt/ apt-get install grub-efi-amd64
+		arch-chroot /mnt/ grub-install --target=x86_64-efi \
+			--efi-directory=/boot/efi
+		arch-chroot /mnt update-grub
+	else
+		# Install/Configure extlinux
+		arch-chroot /mnt/ apt-get install extlinux
+		msg "Listing available devices..."
+		arch-chroot /mnt/ lsblk
+		read -r _resp?"Which device should the bootloader be installed on? (e.g. /dev/sdX) "
+		arch-chroot /mnt /bin/ksh syslinux-install "$_resp"
+		arch-chroot /mnt /bin/ksh syslinux-setup
+	fi
+}
+
 # Finishing touch
 finish() {
 	local _resp
@@ -414,6 +436,9 @@ main() {
 	set_kb
 	set_rootpass
 	set_user
+	inst_kern
+	install_sets
+	set_bootloader
 	finish
 }
 
