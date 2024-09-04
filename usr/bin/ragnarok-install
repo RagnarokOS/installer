@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.83 2024/09/04 16:05:10 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.84 2024/09/04 17:11:40 lecorbeau Exp $
 
 set -e
 
@@ -398,10 +398,13 @@ set_bootloader() {
 		# Install/Configure extlinux
 		arch-chroot /mnt/ apt-get install extlinux
 		msg "Listing available devices..."
+		mkdir -p /mnt/boot/syslinux
+		cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
+		cp /mnt/usr/share/ragnarok/syslinux/zz-update-syslinux /mnt/etc/kernel/postinst.d/
+		chmod 755 /mnt/etc/kernel/postinst.d/zz-update-syslinux
 		arch-chroot /mnt/ lsblk
 		read -r _resp?"Which device should the bootloader be installed on? (e.g. /dev/sdX) "
 		arch-chroot /mnt /bin/ksh syslinux-install "$_resp"
-		arch-chroot /mnt /bin/ksh syslinux-setup
 	fi
 }
 
