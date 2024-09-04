@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.81 2024/09/03 17:43:47 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.82 2024/09/04 15:40:38 lecorbeau Exp $
 
 set -e
 
@@ -340,6 +340,47 @@ set_user() {
 		arch-chroot /mnt usermod -aG wheel,cdrom,floppy,audio,dip,video,plugdev,netdev "$_username"
 		echo "${_username}:${_userpass}" | arch-chroot /mnt chpasswd
 	fi
+}
+
+# Install the kernels
+inst_kern() {
+	# First, install Debian's standard kernel as a back up.
+	msg "Installing the kernel..."
+	arch-chroot /mnt/ apt-get install linux-image-amd64
+	arch-chroot /mnt/ kernupd -d
+	arch-chroot /mnt kernupd -i
+}
+
+# Wrapper function around apt-get. The virt set needs to be installed
+# without recommends, so this is how it'll be handled.
+installcmd() {
+	local _set=$1
+
+	case "$1" in
+		ragnarok-virt)
+			apt-get install --no-install-recommends -y "$_set"
+			;;
+		*)
+			apt-get install -y "$_set"
+			;;
+	esac
+}
+
+# Install the sets.
+install_sets() {
+	local _sets 
+
+	set -A _sets -- $(sed -n 's/Sets = //p' install.conf)
+
+	msg "Installing the sets..."
+	if [[ ${_sets[*]} == none ]] || [[ ${#_sets[@]} -eq 0 ]]; then
+		msg "No sets selected, skipping..."
+	else
+		for _set in "${_sets[@]}"; do
+			installcmd "ragnarok-${_set}"
+		done
+	fi
+
 }
 
 # Finishing touch
