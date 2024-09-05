@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.16 2024/09/01 16:50:49 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.17 2024/09/05 17:11:51 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -175,7 +175,7 @@ ask_kb() {
 			;;
 		*)	set_val KB_Layout "$_resp" "$CONF"
 			# Get variant from the list of available keymaps. One less question to ask.
-			_variant=$(awk -v var="^${_resp}" '$0 ~ var { $1=""; print substr($0,2) }' /usr/share/lists/xkblayout.list)
+			_variant=$(awk -v var="^${_resp}" '$0 ~ var { $1=""; print substr($0,2) }' /usr/share/ragnarok-installer/lists/xkblayout.list)
 			set_val KB_Variant "$_variant" "$CONF"
 			;;
 	esac
