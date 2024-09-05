@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.88 2024/09/05 17:04:50 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.89 2024/09/05 17:27:11 lecorbeau Exp $
 
 set -e
 
@@ -439,6 +439,7 @@ cleanup() {
 			rm /mnt/"${_file}"
 		fi
 	done
+	rm /mnt/"${TMP}"
 }
 
 # Unmount devices
@@ -474,6 +475,9 @@ finish() {
 			;;
 	esac
 }
+
+trap 'cleanup' EXIT
+trap exit HUP INT TERM
 
 main() {
 	run_conf
