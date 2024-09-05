@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.87 2024/09/05 15:33:42 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.88 2024/09/05 17:04:50 lecorbeau Exp $
 
 set -e
 
@@ -425,8 +425,8 @@ set_bootloader() {
 # Don't run user_setup and mkconf if '-a' is given as arg.
 run_conf() {
 	if [[ $ARG != "-a" ]]; then
-		user_setup
 		mkconf
+		user_setup
 	fi
 }
 
