@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.91 2024/09/05 19:20:30 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.92 2024/09/05 19:26:59 lecorbeau Exp $
 
 set -e
 
@@ -277,7 +277,7 @@ set_locale() {
 
 	msg "Setting up locales..."
 	echo "locales locales/default_environment_locale select $_locale" \
-		| arch-chroot /mnt debconf-set-selection
+		| arch-chroot /mnt debconf-set-selections
 	echo "locales locales_to_be_generated multiselect $_locale $_charset" \
 		| arch-chroot /mnt debconf-set-selections
 	arch-chroot /mnt apt-get install locales -y
@@ -438,7 +438,7 @@ cleanup() {
 			rm /mnt/"${_file}"
 		fi
 	done
-	rm /mnt/"${TMP}"
+	rm "${TMP}"
 }
 
 # Unmount devices
@@ -488,8 +488,8 @@ main() {
 	set_net
 	set_hosts
 	refresh_repo
-	set_tz
 	set_locale
+	set_tz
 	set_cons
 	set_kb
 	set_rootpass
