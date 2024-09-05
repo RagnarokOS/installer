@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.86 2024/09/05 15:06:05 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.87 2024/09/05 15:33:42 lecorbeau Exp $
 
 set -e
 
@@ -430,6 +430,35 @@ run_conf() {
 	fi
 }
 
+# Clean up: remove /etc/resolv.conf and, if it exists, machine-id.
+cleanup() {
+	msg "Cleaning up..."
+	rm /mnt/etc/resolv.conf
+	for _file in /etc/machine-id /var/lib/dbus/machine-id; do
+		if [[ -f /mnt/$_file ]]; then
+			rm /mnt/"${_file}"
+		fi
+	done
+}
+
+# Unmount devices
+unmount_dev() {
+	local _dev
+
+	_dev=$(get_val Device "$CONF")
+
+	umount "${_dev}1"
+	umount "${_dev}4"
+	umount "${_dev}3"
+}
+
+# Cleanup and unmount device then reboot
+do_reboot() {
+	cleanup
+	unmount_dev
+	loginctl reboot
+}
+
 # Finishing touch
 finish() {
 	local _resp
@@ -437,11 +466,11 @@ finish() {
 	read -r _resp?"Installation complete. Type r (to reboot) or e (to exit and stay in the live session) then Return. "
 
 	case "$_resp" in
-		r)	loginctl reboot
+		r)	do_reboot
 			;;
 		e)	exit 0
 			;;
-		*)	loginctl reboot
+		*)	do_reboot
 			;;
 	esac
 }
