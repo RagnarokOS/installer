@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.92 2024/09/05 19:26:59 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.93 2024/09/05 19:35:31 lecorbeau Exp $
 
 set -e
 
@@ -165,7 +165,7 @@ mount_dev() {
 
 	case "$_mode" in
 		bios)
-			mkfs.ext4 "${_dev}1"
+			mkfs.ext4 -F "${_dev}1"
 			;;
 		efi)
 			mkfs.vfat -F 32 "${_dev}1"
