@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.94 2024/09/05 19:51:53 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.95 2024/09/07 19:44:50 lecorbeau Exp $
 
 set -e
 
@@ -202,7 +202,7 @@ get_tarball() {
 # Extract base tarball.
 extract() {
 	msg "Extracting the base system..."
-	tar xzpvf "base${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C /mnt
+	tar xzpf "base${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C /mnt
 }
 
 # Set up fstab
@@ -237,8 +237,6 @@ set_hosts() {
 	sed -i "s/ragnarok/$_hostname/g" /mnt/etc/hostname
 	sed -i "2i 127.0.1.1\t${_hostname}" "$1"/etc/hosts
 }
-
-
 
 # Refresh the repository
 refresh_repo() {
@@ -396,7 +394,10 @@ install_sets() {
 
 # Setup the bootloader. Grub for EFI, extlinux for bios/legacy.
 set_bootloader() {
-	local _resp
+	local _resp _dev _bootdev
+
+	_dev=$(get_val Device "$CONF")
+	_bootdev=$(lsblk -lp "$_dev" | awk '/boot/ { print $1 }')
 
 	msg "Installing the grub bootloader..."
 	if [ -d /mnt/boot/efi ]; then
@@ -413,20 +414,11 @@ set_bootloader() {
 		cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
 		cp /mnt/usr/share/ragnarok/syslinux/zz-update-syslinux /mnt/etc/kernel/postinst.d/
 		chmod 755 /mnt/etc/kernel/postinst.d/zz-update-syslinux
-		arch-chroot /mnt/ lsblk
-		read -r _resp?"Which device should the bootloader be installed on? (e.g. /dev/sdX) "
-		arch-chroot /mnt /bin/ksh syslinux-install "$_resp"
+		arch-chroot /mnt /bin/ksh syslinux-install "${_bootdev}"
 	fi
 }
 
 # Don't run user_setup and mkconf if '-a' is given as arg.
-run_conf() {
-	if [[ $ARG != "-a" ]]; then
-		mkconf
-		user_setup
-	fi
-}
-
 # Clean up: remove /etc/resolv.conf and, if it exists, machine-id.
 cleanup() {
 	msg "Cleaning up..."
@@ -475,6 +467,24 @@ finish() {
 
 trap 'cleanup' EXIT
 trap exit HUP INT TERM
+
+_installtype="interactive"
+
+# Will use getopts because there's no doubt more opts
+# will come (such as verbosity level).
+while getopts ":a" opt; do
+	case "$_opt" in
+		a) _installtype="auto" ;;
+	esac
+done
+
+# Don't run user_setup and mkconf if '-a' is given as arg.
+run_conf() {
+	if [[ $_installtype == "interactive" ]]; then
+		mkconf
+		user_setup
+	fi
+}
 
 main() {
 	run_conf
