@@ -1,13 +1,12 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.95 2024/09/07 19:44:50 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.96 2024/09/08 16:12:44 lecorbeau Exp $
 
 set -e
 
 . /usr/lib/ragnarok-installer/funcs
 
-ARG=$1
 CONF=${CONF:-install.conf}
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
@@ -235,7 +234,7 @@ set_hosts() {
 
 	msg "Setting up hostname and hosts file..."
 	sed -i "s/ragnarok/$_hostname/g" /mnt/etc/hostname
-	sed -i "2i 127.0.1.1\t${_hostname}" "$1"/etc/hosts
+	sed -i "2i 127.0.1.1\t${_hostname}" /mnt/etc/hosts
 }
 
 # Refresh the repository
@@ -472,7 +471,7 @@ _installtype="interactive"
 
 # Will use getopts because there's no doubt more opts
 # will come (such as verbosity level).
-while getopts ":a" opt; do
+while getopts ":av" _opt; do
 	case "$_opt" in
 		a) _installtype="auto" ;;
 	esac
