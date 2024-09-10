@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.100 2024/09/10 16:30:50 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.101 2024/09/10 17:41:15 lecorbeau Exp $
 
 set -e
 
@@ -381,7 +381,7 @@ set_user() {
 inst_kern() {
 	# First, install Debian's standard kernel as a back up.
 	msg "Installing the kernel..."
-	arch-chroot /mnt/ apt-get install linux-image-amd64
+	arch-chroot /mnt/ apt-get install linux-image-amd64 -y
 	arch-chroot /mnt/ kernupd -d
 	arch-chroot /mnt kernupd -i
 }
@@ -434,7 +434,7 @@ set_bootloader() {
 		arch-chroot /mnt update-grub
 	else
 		# Install/Configure extlinux
-		arch-chroot /mnt/ apt-get install extlinux
+		arch-chroot /mnt/ apt-get install extlinux -y
 		msg "Listing available devices..."
 		mkdir -p /mnt/boot/syslinux
 		cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
