@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.102 2024/09/10 17:44:26 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.103 2024/09/11 15:27:38 lecorbeau Exp $
 
 set -e
 
@@ -424,7 +424,6 @@ set_bootloader() {
 	local _resp _dev _bootdev
 
 	_dev=$(get_val Device "$CONF")
-	_bootdev=$(lsblk -lp "$_dev" | awk '/boot/ { print $1 }')
 
 	msg "Installing the grub bootloader..."
 	if [ -d /mnt/boot/efi ]; then
@@ -441,7 +440,7 @@ set_bootloader() {
 		cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
 		cp /mnt/usr/share/ragnarok/syslinux/zz-update-syslinux /mnt/etc/kernel/postinst.d/
 		chmod 755 /mnt/etc/kernel/postinst.d/zz-update-syslinux
-		arch-chroot /mnt /bin/ksh syslinux-install "${_bootdev}"
+		arch-chroot /mnt /bin/ksh syslinux-install "${_dev}"
 	fi
 }
 
