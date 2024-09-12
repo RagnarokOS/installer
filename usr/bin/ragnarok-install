@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.105 2024/09/12 15:40:42 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.106 2024/09/12 17:54:55 lecorbeau Exp $
 
 set -e
 
@@ -208,8 +208,13 @@ mount_dev() {
 
 # Don't pollute console with stdout.
 make_dev() {
-	part_dev > /dev/null
-	mount_dev > /dev/null
+	# If no boot part size is not present, then the user skipped partitioning.
+	if [[ -z $(get_val Bootmode "$CONF") ]]; then
+		_skipbootloader="yes"
+	else
+		part_dev > /dev/null
+		mount_dev > /dev/null
+	fi
 }
 
 # Download the tarball
@@ -425,24 +430,28 @@ set_bootloader() {
 
 	_dev=$(get_val Device "$CONF")
 
-	msg "Installing the grub bootloader..."
-	if [ -d /mnt/boot/efi ]; then
-		# Install grub-efi
-		arch-hroot /mnt/ apt-get install grub-efi-amd64
-		arch-chroot /mnt/ grub-install --target=x86_64-efi \
-			--efi-directory=/boot/efi
-		arch-chroot /mnt update-grub
-	else
-		# Install/Configure extlinux
-		arch-chroot /mnt/ apt-get install extlinux -y
-		msg "Listing available devices..."
-		mkdir -p /mnt/boot/syslinux
-		cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
-		cp /mnt/usr/share/ragnarok/syslinux/syslinux-install /mnt/usr/bin/
-		cp /mnt/usr/share/ragnarok/syslinux/zz-update-syslinux /mnt/etc/kernel/postinst.d/
-		chmod 755 /mnt/etc/kernel/postinst.d/zz-update-syslinux
-		chmod 755 /mnt/usr/bin/syslinux-install
-		arch-chroot /mnt /bin/ksh /usr/bin/syslinux-install "${_dev}"
+	# Skip this if the user created custom partitions. They'll need
+	# to install the bootloader on their own.
+	if [[ $_skipbootloader != "yes" ]]; then
+		msg "Installing the grub bootloader..."
+		if [ -d /mnt/boot/efi ]; then
+			# Install grub-efi
+			arch-hroot /mnt/ apt-get install grub-efi-amd64
+			arch-chroot /mnt/ grub-install --target=x86_64-efi \
+				--efi-directory=/boot/efi
+			arch-chroot /mnt update-grub
+		else
+			# Install/Configure extlinux
+			arch-chroot /mnt/ apt-get install extlinux -y
+			msg "Listing available devices..."
+			mkdir -p /mnt/boot/syslinux
+			cp /mnt/usr/share/ragnarok/syslinux/syslinux.cfg /mnt/boot/syslinux/
+			cp /mnt/usr/share/ragnarok/syslinux/syslinux-install /mnt/usr/bin/
+			cp /mnt/usr/share/ragnarok/syslinux/zz-update-syslinux /mnt/etc/kernel/postinst.d/
+			chmod 755 /mnt/etc/kernel/postinst.d/zz-update-syslinux
+			chmod 755 /mnt/usr/bin/syslinux-install
+			arch-chroot /mnt /bin/ksh /usr/bin/syslinux-install "${_dev}"
+		fi
 	fi
 }
 
