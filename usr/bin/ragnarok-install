@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.106 2024/09/12 17:54:55 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.107 2024/09/12 17:56:59 lecorbeau Exp $
 
 set -e
 
@@ -506,6 +506,7 @@ trap 'cleanup' EXIT
 trap exit HUP INT TERM
 
 _installtype="interactive"
+_skipbootloader="no"
 
 # Will use getopts because there's no doubt more opts
 # will come (such as verbosity level).
