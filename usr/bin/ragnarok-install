@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.107 2024/09/12 17:56:59 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.108 2024/09/12 23:51:46 lecorbeau Exp $
 
 set -e
 
@@ -372,6 +372,7 @@ set_rootpass() {
 	msg "Setting up root..."
 
 	echo "root:$_rootpass" | arch-chroot /mnt chpasswd
+	unset _rootpass
 }
 
 set_user() {
@@ -380,6 +381,7 @@ set_user() {
 		arch-chroot /mnt useradd -m -s /bin/ksh "$_username"
 		arch-chroot /mnt usermod -aG wheel,cdrom,floppy,audio,dip,video,plugdev,netdev "$_username"
 		echo "${_username}:${_userpass}" | arch-chroot /mnt chpasswd
+		unset _userpass
 	fi
 }
 
