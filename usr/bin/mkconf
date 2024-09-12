@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # mkconf - create install.conf
-# $Ragnarok: mkconf,v 1.17 2024/09/05 17:11:51 lecorbeau Exp $
+# $Ragnarok: mkconf,v 1.18 2024/09/12 17:59:08 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -36,6 +36,8 @@ set_val() {
 ask_part() {
 	local _resp
 
+	read -r _resp?"Enter the boot mode for this system ('efi' or 'bios'): "
+	set_val Bootmode "$_resp" "$CONF"
 	msg "Choose the size of each partitions. Hint: for values in megabytes, use M (e.g. 500M), for gigabytes, use G (e.g. 30G)"
 	read -r _resp?"Size of swap partition: "
 	set_val Swap "$_resp" "$CONF"
@@ -53,8 +55,6 @@ mkdisk() {
 	echo
 	read -r _resp?"Which disk should the system be installed on? (enter device, e.g. /dev/sdX): "
 	set_val Device "$_resp" "$CONF"
-	read -r _resp?"Enter the boot mode for this system ('efi' or 'bios'): "
-	set_val Bootmode "$_resp" "$CONF"
 
 	_dev=$(get_val Device "$CONF")
 
