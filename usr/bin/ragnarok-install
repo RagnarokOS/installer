@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.110 2024/09/14 17:49:38 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.111 2024/09/14 18:36:58 lecorbeau Exp $
 
 set -e
 
@@ -135,7 +135,7 @@ part_dev() {
 	_home=$(get_val Home "$CONF")
 
 	# Wipe device
-	sfdisk --delete "$_dev"
+	sfdisk --delete "$_dev" || true
 
 	# Set the proper part table (mbr for bios, GPT for EFI).
 	case "$_mode" in
