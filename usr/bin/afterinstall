@@ -1,0 +1,42 @@
+#!/bin/ksh
+
+# $Ragnarok: afterinstall,v 1.1 2024/09/18 17:08:06 lecorbeau Exp $
+
+. /lib/ragnarok-installer/funcs
+
+# Create /var/log/messages/welcome.txt
+/usr/bin/mkdir -p /var/messages
+
+msg "
+Welcome to Ragnarok
+
+$(lsb_release -a 2>/dev/null)
+Installed on:	$(date)
+
+If you have not done so already, it is highly recommended to read the
+afterboot(8) manual page.
+
+If you encounter any bugs, please report them in the issue tracker of
+the appropriate repository at https://github.com/RagnarokOS/.
+" > /mnt/var/messages/welcome.txt
+
+# Populate rc.local.
+msg "
+# Commands to run on first boot
+
+cleanup() {
+	sed -i '/# Commands to run on first boot/,\$d' /etc/rc.local
+}
+trap 'cleanup' EXIT
+trap exit HUP INT TERM
+
+# Mail welcome message
+/usr/bin/cat /var/messages/welcome.txt | /usr/bin/mail -r \"LeCorbeau@ragnarok\" -s \"Welcome\" root
+
+# Run the security-check cron job right away.
+/etc/cron.weekly/security-check
+
+# In the end, this script needs to disable and remove itself.
+/usr/sbin/update-rc.d -f firstboot remove
+" >> /mnt/etc/rc.local
+
