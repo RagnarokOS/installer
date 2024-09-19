@@ -1,6 +1,7 @@
 #!/bin/ksh
 
-# $Ragnarok: afterinstall,v 1.1 2024/09/18 17:08:06 lecorbeau Exp $
+# $Ragnarok: afterinstall,v 1.2 2024/09/19 19:31:17 lecorbeau Exp $
+# Post install actions for the installer.
 
 . /lib/ragnarok-installer/funcs
 
