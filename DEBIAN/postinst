@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Fix permissions
+/usr/bin/chmod 644 /lib/ragnarok-installer/funcs
+/usr/bin/chown root:root /lib/ragnarok-installer/funcs
+/usr/bin/chmod 755 /usr/bin/afterinstall
+/usr/bin/chmod 755 /usr/bin/mkconf
+/usr/bin/chmod 755 /usr/bin/ragnarok-install
+/usr/bin/chmod 755 /usr/bin/setcons
+/usr/bin/chown root:root /usr/bin/afterinstall
+/usr/bin/chown root:root /usr/bin/mkconf
+/usr/bin/chown root:root /usr/bin/ragnarok-install
+/usr/bin/chown root:root /usr/bin/setcons
+/usr/bin/chmod 644 /usr/share/ragnarok-installer/lists/*
+/usr/bin/chown root:root /usr/share/ragnarok-installer/lists/*
