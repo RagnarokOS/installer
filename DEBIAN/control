@@ -1,7 +1,9 @@
 Package: ragnarok-installer
 Version: 01
-Maintainer: Ian LeCorbeau <I-LeCorbeau@protonmail.com>
+Section: devel
+Priority: optional
 Architecture: amd64
+Maintainer: Ian LeCorbeau <I-LeCorbeau@protonmail.com>
 Depends: mmdebstrap,
  arch-install-scripts,
  wget
