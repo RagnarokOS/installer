@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.112 2024/09/18 17:10:39 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.113 2024/09/29 15:16:28 lecorbeau Exp $
 
 set -e
 
@@ -18,7 +18,7 @@ URL="${MIRROR}${VERSION}"
 # I take no credit for this function. All credit goes to
 # Antoine Jacoutot, who wrote OpenBSD's syspatch(1).
 unpriv() {
-	local _file=$2 _ret=0 _user=user
+	local _file=$2 _ret=0 _user=_installer
 
 	if [[ $1 == -f && -n ${_file} ]]; then
 		# shellcheck disable=SC2188
