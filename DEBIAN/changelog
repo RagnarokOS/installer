@@ -1,0 +1,6 @@
+ragnarok-installer (01-1) stable; urgency=medium
+
+  * Use the '_installer' user for commands that need to
+    be run without root privileges.
+
+ -- Ian LeCorbeau <I-LeCorbeau@protonmail.com>  Sun, 29 Sept 2024 11:33:52 -0400
