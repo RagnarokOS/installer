@@ -1,5 +1,5 @@
 Package: ragnarok-installer
-Version: 01
+Version: 01-1
 Section: devel
 Priority: optional
 Architecture: amd64
