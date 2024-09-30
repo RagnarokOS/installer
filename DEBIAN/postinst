@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Ragnarok: postinst,v 1.1 2024/09/29 15:15:19 lecorbeau Exp $
+# $Ragnarok: postinst,v 1.2 2024/09/30 15:34:25 lecorbeau Exp $
 
 # Fix permissions
 /usr/bin/chmod 644 /lib/ragnarok-installer/funcs
@@ -9,10 +9,16 @@
 /usr/bin/chmod 755 /usr/bin/mkconf
 /usr/bin/chmod 755 /usr/bin/ragnarok-install
 /usr/bin/chmod 755 /usr/bin/setcons
+/usr/bin/chmod 755 /usr/bin/setkb
+/usr/bin/chmod 755 /usr/bin/setlocale
+/usr/bin/chmod 755 /usr/bin/settz
 /usr/bin/chown root:root /usr/bin/afterinstall
 /usr/bin/chown root:root /usr/bin/mkconf
 /usr/bin/chown root:root /usr/bin/ragnarok-install
 /usr/bin/chown root:root /usr/bin/setcons
+/usr/bin/chown root:root /usr/bin/setkb
+/usr/bin/chown root:root /usr/bin/setlocale
+/usr/bin/chown root:root /usr/bin/settz
 /usr/bin/chmod 644 /usr/share/ragnarok-installer/lists/*
 /usr/bin/chown root:root /usr/share/ragnarok-installer/lists/*
 
