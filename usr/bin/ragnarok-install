@@ -1,11 +1,11 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.114 2024/09/29 17:19:03 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.115 2024/09/30 15:35:50 lecorbeau Exp $
 
 set -e
 
-. /usr/lib/ragnarok-installer/funcs
+. /lib/ragnarok-installer/funcs
 
 CONF=${CONF:-install.conf}
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
