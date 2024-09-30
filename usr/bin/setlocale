@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# $Ragnarok: setlocale,v 1.1 2024/09/30 15:15:43 lecorbeau Exp $
+# Set the locale and console in one go. This script is provided by the
+# installer package to be used during 'chroot-style' installs.
+
+. /lib/ragnarok-installer/funcs
+
+_locale=$1
+_charset=$2
+
+msg "Setting up locales..."
+echo "locales locales/default_environment_locale select $_locale" \
+	| arch-chroot /mnt debconf-set-selections
+echo "locales locales/locales_to_be_generated multiselect $_locale $_charset" \
+	| arch-chroot /mnt debconf-set-selections
+arch-chroot /mnt apt-get install locales -y
+
+msg "Setting up the console..."
+setcons "$_locale" "$_charset"
+arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install console-setup -y"
