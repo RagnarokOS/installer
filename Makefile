@@ -1,8 +1,8 @@
 # Build ragnarok-install package
-# $Ragnarok: Makefile,v 1.9 2024/09/29 17:20:12 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.10 2024/10/01 19:36:11 lecorbeau Exp $
 
 PKG	= ragnarok-installer
-VERSION	= 01-1
+VERSION	= 01-2
 DESTDIR	= ${PKG}_${VERSION}
 
 all: 

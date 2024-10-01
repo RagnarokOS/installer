@@ -1,3 +1,11 @@
+ragnarok-installer (01-2) stable; urgency=medium
+
+  * New tools: setlocale, setkb, settz. These can be used during
+    chroot-style installs to properly and quickly set up the locale,
+    timezone and keymap.
+
+ -- Ian LeCorbeau <I-LeCorbeau@protonmail.com>  Sun, 01 Oct 2024 15:33:32 -0400
+
 ragnarok-installer (01-1) stable; urgency=medium
 
   * Use the '_installer' user for commands that need to
