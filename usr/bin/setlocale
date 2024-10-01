@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Ragnarok: setlocale,v 1.1 2024/09/30 15:15:43 lecorbeau Exp $
+# $Ragnarok: setlocale,v 1.2 2024/10/01 17:24:27 lecorbeau Exp $
 # Set the locale and console in one go. This script is provided by the
 # installer package to be used during 'chroot-style' installs.
 
@@ -18,4 +18,6 @@ arch-chroot /mnt apt-get install locales -y
 
 msg "Setting up the console..."
 setcons "$_locale" "$_charset"
+# kmod is needed by console-setup but isn't a dependency of it.
+arch-chroot /mnt apt-get install kmod -y
 arch-chroot /mnt /bin/ksh -c "DEBIAN_FRONTEND=noninteractive apt-get install console-setup -y"
