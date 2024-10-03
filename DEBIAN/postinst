@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# $Ragnarok: postinst,v 1.2 2024/09/30 15:34:25 lecorbeau Exp $
+# $Ragnarok: postinst,v 1.3 2024/10/03 15:22:34 lecorbeau Exp $
+
+set -e
 
 # Fix permissions
 /usr/bin/chmod 644 /lib/ragnarok-installer/funcs
@@ -22,6 +24,9 @@
 /usr/bin/chmod 644 /usr/share/ragnarok-installer/lists/*
 /usr/bin/chown root:root /usr/share/ragnarok-installer/lists/*
 
-# Create the _installer user for the unpriv() function
-/usr/sbin/useradd --system --no-create-home --home /nonexistent \
-	--shell=/usr/sbin/nologin _installer
+# Create the _installer user for the unpriv() function if it doesn't
+# already exists.
+if ! getent passwd _installer >/dev/null; then
+	/usr/sbin/useradd --system --no-create-home --home /nonexistent \
+		--shell=/usr/sbin/nologin _installer
+fi
