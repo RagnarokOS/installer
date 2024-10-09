@@ -1,3 +1,14 @@
+ragnarok-installer (01-4) stable; urgency=medium
+
+  * New feature: allow users to install custom sets or deb pkgs.
+  * Bug fixes:
+    * Fixed a bug that messed up disk creation if Rootpass is also
+      present in install.conf.
+    * Fixed wrong path for /var/messages in afterinstall.
+    * Multiple small fixes.
+
+ -- Ian LeCorbeau <I-LeCorbeau@protonmail.com>  Wed, 09 Oct 2024 14:09:12 -0400
+
 ragnarok-installer (01-3) stable; urgency=medium
 
   * Fix critical error in postinst: only create the _installer
