@@ -1,12 +1,12 @@
 #!/bin/ksh
 
-# $Ragnarok: afterinstall,v 1.2 2024/09/19 19:31:17 lecorbeau Exp $
+# $Ragnarok: afterinstall,v 1.3 2024/10/09 18:03:37 lecorbeau Exp $
 # Post install actions for the installer.
 
 . /lib/ragnarok-installer/funcs
 
 # Create /var/log/messages/welcome.txt
-/usr/bin/mkdir -p /var/messages
+/usr/bin/mkdir -p /mnt/var/messages
 
 msg "
 Welcome to Ragnarok

@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.120 2024/10/09 17:49:33 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.121 2024/10/09 18:02:47 lecorbeau Exp $
 
 set -e
 
@@ -435,7 +435,7 @@ install_custom() {
 	if [[ -n $_cs ]]; then
 		for _deb in $_cs; do
 			cp "$_deb" /mnt/
-			arch-chroot /mnt /bin/ksh apt-get install ./"$_deb"
+			arch-chroot /mnt apt-get install ./"$_deb" -y
 		done
 	fi
 }
