@@ -1,7 +1,7 @@
 ## Library containing functions used by Ragnarok's installers (plain-text
 ## and TUI), as well as other tools (mkdisk, etc).
 
-# $Ragnarok: funcs,v 1.2 2024/08/05 17:15:09 lecorbeau Exp $
+# $Ragnarok: funcs,v 1.3 2024/10/09 17:50:42 lecorbeau Exp $
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #											#
@@ -39,7 +39,7 @@ set_val() {
 get_val() {
 	local _conf="$1" _file="$2"
 
-	awk -v var="$_conf" '$0 ~ var { print $3 }' "$_file"
+	awk -v var="$_conf =" '$0 ~ var { print $3 }' "$_file"
 }
 
 reset_val() {

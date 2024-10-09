@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.118 2024/10/09 17:12:09 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.120 2024/10/09 17:49:33 lecorbeau Exp $
 
 set -e
 
@@ -562,7 +562,6 @@ main() {
 	install_sets
 	install_custom
 	set_bootloader
-	finish
 }
 
 main
