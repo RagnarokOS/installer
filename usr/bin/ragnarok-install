@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.117 2024/10/09 15:56:26 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.118 2024/10/09 17:12:09 lecorbeau Exp $
 
 set -e
 
@@ -228,7 +228,7 @@ get_tarball() {
 # Extract base tarball.
 extract() {
 	msg "Extracting the base system..."
-	tar xzpf "${TMP}/base${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C mnt/
+	tar xzpf "${TMP}/base${VERSION}.tgz" --xattrs --xattrs-include='*' --numeric-owner -C /mnt/
 }
 
 # Copy install.conf to the chroot.
