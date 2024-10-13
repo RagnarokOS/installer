@@ -1,0 +1,15 @@
+#!/bin/ksh
+
+# $Ragnarok$
+
+# Set colors
+export NEWT_COLORS='
+root=black,black
+shadow=black,black
+window=,black
+border=white,black
+title=white,black
+textbox=white,black
+button=black,white
+compactbutton=white,black
+'
