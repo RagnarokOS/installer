@@ -2,6 +2,9 @@
 
 # $Ragnarok$
 
+. /lib/ragnarok-installer/funcs
+. /lib/ragnarok-installer/lists
+
 # Set colors
 export NEWT_COLORS='
 root=black,black
@@ -11,5 +14,22 @@ border=white,black
 title=white,black
 textbox=white,black
 button=black,white
+checkbox=white,black
+actcheckbox=black,white
 compactbutton=white,black
+entry=white,black
 '
+
+# Configure disk
+disk_conf() {
+	local _disk _rc=$?
+
+	_disk=$(whiptail --title "Disk Setup" --inputbox "$(lsblk -nd)\n\nWhich disk should the system be installed on? (e.g. /dev/sdX)" 15 40 3>&1 1>&2 2>&3)
+
+	if [[ $_rc == 0 ]]; then
+		_dev="$_disk"
+	else
+		echo "Disk setup cancelled, exiting..."
+		exit 1
+	fi
+}
