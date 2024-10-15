@@ -1,0 +1,72 @@
+#!/bin/ksh
+
+# $Ragnarok: mkdisk,v 1.1 2024/10/15 22:39:08 lecorbeau Exp $
+
+. /lib/ragnarok-installer/funcs
+
+export NEWT_COLORS='
+root=black,black
+shadow=black,black
+window=,black
+border=white,black
+title=white,black
+textbox=white,black
+button=black,white
+compactbutton=white,black
+entry=white,black
+checkbox=white,black
+actcheckbox=black,white
+actlistbox=white,black
+sellistbox=white,black
+'
+
+# Only set value if exit status is 0.
+do_conf() {
+	local _opt=$1 _val=$2 _rc=$?
+
+	if [[ $_rc == 0 ]]; then
+		set_val "$_opt" "$_val" install.conf
+	else
+		msg "Setup cancelled, exiting..."
+		rm install.conf
+		exit 1
+	fi
+}
+
+# Function to configure the disks.
+disk_conf() {
+	# Ask for disk
+	_disk=$(whiptail --title "Disk setup" --inputbox "$(lsblk -nd)\n\nWhich disk should the system be installed on (e.g. /dev/sdX)?" 15 45 3>&1 1>&2 2>&3)
+	do_conf Device "$_disk"
+
+	# Ask for Bootmode
+	_bootmode=$(whiptail --title "Disk setup" --inputbox "Enter the boot mode for this system (efi or bios)" 15 45 3>&1 1>&2 2>&3)
+	do_conf Bootmode "$_bootmode"
+
+	# Ask for the size of swap
+	_swap=$(whiptail --title "Disk Setup" --inputbox "Size of swap partition?" 15 45 4G 3>&1 1>&2 2>&3)
+	do_conf Swap "$_swap"
+
+	# Ask for the size of root
+	_root=$(whiptail --title "Disk Setup" --inputbox "Size of root partition?" 15 45 30G 3>&1 1>&2 2>&3)
+	do_conf Root "$_root"
+
+	# Ask for the size of home
+	_home=$(whiptail --title "Disk Setup" --inputbox "Size of home partition? (Leave empty to use all remaining space)" 15 45 3>&1 1>&2 2>&3)
+	do_conf Home "$_home"
+}
+disk_conf
+
+# Ask to proceed
+whiptail --title "Disk Setup" --yesno "The installer will create the following partitions on ${_disk}. Warning all data will be erased.
+
+	500M /boot on ${_disk}1
+	$_swap swap on ${_disk}2
+	$_root / on ${_disk}3
+	$_home /home on ${_disk}4\n\nProceed?" 20 45 3>&1 1>&2 2>&3
+_ret=$?
+case "$_ret" in
+	0)	exit 0 ;;
+	1)	rm install.conf
+		disk_conf ;;
+esac
