@@ -20,16 +20,27 @@ compactbutton=white,black
 entry=white,black
 '
 
-# Configure disk
-disk_conf() {
-	local _disk _rc=$?
+## Global Variables
+FLAVOUR="bookworm"
+VERSION="01"
 
-	_disk=$(whiptail --title "Disk Setup" --inputbox "$(lsblk -nd)\n\nWhich disk should the system be installed on? (e.g. /dev/sdX)" 15 40 3>&1 1>&2 2>&3)
+## Functions
 
-	if [[ $_rc == 0 ]]; then
-		_dev="$_disk"
-	else
-		echo "Disk setup cancelled, exiting..."
-		exit 1
-	fi
+# Create the base system.
+debstrap() {
+	/usr/bin/mmdebstrap --variant=minbase \
+		--components="main non-free-firmware" \
+		--include="usrmerge ca-certificates oksh signify-openbsd less wget ed" \
+		--hook-directory=/lib/ragnarok-installer/hooks \
+		--skip=check/empty "${FLAVOUR}" /mnt \
+		"deb https://ragnarokos.github.io/base/deb/ ${VERSION} main" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR} main non-free-firmware" \
+		"deb http://security.debian.org/ ${FLAVOUR}-security main non-free-firmware" \
+		"deb http://deb.debian.org/debian/ ${FLAVOUR}-updates main non-free-firmware"
 }
+
+main() {
+	/lib/ragnarok-installer/mkdisk
+	debstrap
+}
+main
