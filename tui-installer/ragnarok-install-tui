@@ -124,16 +124,9 @@ mount_dev() {
 
 # Don't pollute console with stdout.
 make_dev() {
-	# If no boot part size is not present, then the user skipped partitioning.
-	if [[ -z $(get_val Bootmode "$CONF") ]]; then
-		_skipbootloader="yes"
-	else
-		part_dev > /dev/null
-		mount_dev > /dev/null
-	fi
+	part_dev > /dev/null
+	mount_dev > /dev/null
 }
-
-
 
 main() {
 	/lib/ragnarok-installer/mkdisk
