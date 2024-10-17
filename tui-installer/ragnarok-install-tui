@@ -130,6 +130,8 @@ make_dev() {
 
 main() {
 	/lib/ragnarok-installer/mkdisk
+	_ret=$?
+	[[ $_ret == 1 ]] && exit 1
 	debstrap
 }
 main
