@@ -1,15 +1,22 @@
 #!/bin/sh
 
-# $Ragnarok: postinst,v 1.3 2024/10/03 15:22:34 lecorbeau Exp $
+# $Ragnarok: postinst,v 1.4 2024/10/18 15:35:18 lecorbeau Exp $
 
 set -e
 
 # Fix permissions
 /usr/bin/chmod 644 /lib/ragnarok-installer/funcs
 /usr/bin/chown root:root /lib/ragnarok-installer/funcs
+/usr/bin/chmod 644 /lib/ragnarok-installer/hooks/customize01.sh
+/usr/bin/chmod 644 /lib/ragnarok-installer/hooks/customize02.sh
+/usr/bin/chmod 644 /lib/ragnarok-installer/hooks/setup01.sh
+/usr/bin/chown root:root /lib/ragnarok-installer/hooks/customize01.sh
+/usr/bin/chown root:root /lib/ragnarok-installer/hooks/customize02.sh
+/usr/bin/chown root:root /lib/ragnarok-installer/hooks/setup01.sh
 /usr/bin/chmod 755 /usr/bin/afterinstall
 /usr/bin/chmod 755 /usr/bin/mkconf
 /usr/bin/chmod 755 /usr/bin/ragnarok-install
+/usr/bin/chmod 755 /usr/bin/rstrap
 /usr/bin/chmod 755 /usr/bin/setcons
 /usr/bin/chmod 755 /usr/bin/setkb
 /usr/bin/chmod 755 /usr/bin/setlocale
@@ -17,6 +24,7 @@ set -e
 /usr/bin/chown root:root /usr/bin/afterinstall
 /usr/bin/chown root:root /usr/bin/mkconf
 /usr/bin/chown root:root /usr/bin/ragnarok-install
+/usr/bin/chown root:root /usr/bin/rstrap
 /usr/bin/chown root:root /usr/bin/setcons
 /usr/bin/chown root:root /usr/bin/setkb
 /usr/bin/chown root:root /usr/bin/setlocale
