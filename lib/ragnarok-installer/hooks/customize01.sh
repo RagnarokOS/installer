@@ -1,7 +1,7 @@
 #!/bin/ksh
 
-# Commands to configure miniroot.
-# $Ragnarok: customize01.sh,v 1.4 2024/06/30 17:12:02 lecorbeau Exp $
+# Commands to configure the base system.
+# $Ragnarok: customize01.sh,v 1.5 2024/10/18 15:45:57 lecorbeau Exp $
 
 set -e
 
@@ -24,6 +24,6 @@ chroot "$1" ln -sf /usr/bin/signify-openbsd /usr/bin/signify
 
 # Install man-db dummy
 _mdb_dummy="man-db_999+ragnarok01_amd64.deb"
-cp iso/live/config/packages.chroot/"$_mdb_dummy" "$1"/
+cp /var/db/dummies/"$_mdb_dummy" "$1"/
 chroot "$1" apt-get install ./"$_mdb_dummy" -y
 chroot "$1" rm "$_mdb_dummy"
