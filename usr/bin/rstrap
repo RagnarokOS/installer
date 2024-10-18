@@ -1,10 +1,20 @@
 #!/bin/ksh
 
-# $Ragnarok: rstrap,v 1.1 2024/10/18 15:24:41 lecorbeau Exp $
+# $Ragnarok: rstrap,v 1.2 2024/10/18 18:46:12 lecorbeau Exp $
 
 FLAVOUR="bookworm"
 VERSION="01"
 TARGET="$1"
+
+usage() {
+	printf '%s\n' "You must specify a mount point or directory as argument 1, e.g.
+
+	rstrap /mnt
+"
+	exit 1
+}
+
+[[ -z "$1" ]] && usage
 
 /usr/bin/mmdebstrap --variant=minbase \
 	--components="main non-free-firmware" \
