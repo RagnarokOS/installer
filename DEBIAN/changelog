@@ -1,3 +1,10 @@
+ragnarok-installer (01-5) stable; urgency=medium
+
+  * Added new tool to quickly build the system from scratch
+    during chroot-style installs.
+
+ -- Ian LeCorbeau <I-LeCorbeau@protonmail.com>  Sun, 20 Oct 2024 11:30:15 -0400
+
 ragnarok-installer (01-4) stable; urgency=medium
 
   * New feature: allow users to install custom sets or deb pkgs.
