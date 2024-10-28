@@ -1,3 +1,10 @@
+ragnarok-installer (01-6) stable; urgency=medium
+
+  * The installer script now uses apt-get to install Ragnarok's
+    kernel build.
+
+ -- Ian LeCorbeau <I-LeCorbeau@protonmail.com>  Sun, 27 Oct 2024 14:51:19 -0400
+
 ragnarok-installer (01-5) stable; urgency=medium
 
   * Added new tool to quickly build the system from scratch
