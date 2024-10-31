@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.122 2024/10/27 17:29:39 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.123 2024/10/31 17:27:09 lecorbeau Exp $
 
 set -e
 
@@ -393,21 +393,6 @@ inst_kern() {
 	arch-chroot /mnt/ apt-get install linux-image-ragnarok-amd64 -y
 }
 
-# Wrapper function around apt-get. The virt set needs to be installed
-# without recommends, so this is how it'll be handled.
-installcmd() {
-	local _set=$1
-
-	case "$1" in
-		ragnarok-virt)
-			apt-get install --no-install-recommends -y "$_set"
-			;;
-		*)
-			apt-get install -y "$_set"
-			;;
-	esac
-}
-
 # Install the sets.
 install_sets() {
 	local _sets 
@@ -419,7 +404,14 @@ install_sets() {
 		msg "No sets selected, skipping..."
 	else
 		for _set in "${_sets[@]}"; do
-			installcmd "ragnarok-${_set}"
+			case "$_set" in
+				ragnarok-virt)
+					arch-chroot /mnt apt-get install --no-install-recommends -y ragnarok-"$_set"
+					;;
+				*)
+					arch-chroot /mnt apt-get install -y ragnarok-"$_set"
+					;;
+			esac
 		done
 	fi
 
