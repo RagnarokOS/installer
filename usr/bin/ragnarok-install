@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.123 2024/10/31 17:27:09 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.124 2024/12/21 16:50:03 lecorbeau Exp $
 
 set -e
 
@@ -11,7 +11,7 @@ CONF=${CONF:-install.conf}
 TMP=$(mktemp -d -p /tmp ragnarok-install.XXXXXXXXXX)
 # Parse config values
 MIRROR="https://github.com/RagnarokOS/distrib/releases/download/"
-VERSION="01"
+VERSION="-current"
 URL="${MIRROR}${VERSION}"
 
 # Never download stuff off the internet as the root user.
