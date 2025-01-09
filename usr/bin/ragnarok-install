@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 # Main installer script.
-# $Ragnarok: ragnarok-install,v 1.124 2024/12/21 16:50:03 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.125 2025/01/09 23:48:40 lecorbeau Exp $
 
 set -e
 
@@ -417,6 +417,14 @@ install_sets() {
 
 }
 
+# If an interface is configured in /etc/network/interfaces.d/ then
+# install wpasupplicant.
+install_wpa() {
+	if [[ -z $(find /mnt/etc/network/interfaces.d/ -prune -empty 2>/dev/null) ]]; then
+		arch-chroot /mnt apt-get install -y wpasupplicant
+	fi
+}
+
 # Allow users to install custom sets or any other .deb package
 install_custom() {
 	local _cs
@@ -551,6 +559,7 @@ main() {
 	set_user
 	inst_kern
 	install_sets
+	install_wpa
 	install_custom
 	set_bootloader
 }
