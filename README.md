@@ -3,13 +3,9 @@ Ragnarok-installer
 
 **Work in progress**
 
-This repository contains the Makefile to create the rootfs used by the
-installer, as well as the installer itself.
+This repository contains the Makefile and scripts to install the Ragnarok
+system.
 
-For development notes, see `notes.txt` in this repository.
+## Install
 
-### installer.pl
-
-This is an experimental version written in perl.
-For details see [README.md](https://github.com/RagnarokOS/installer/tree/master/perl-installer/README.md)
-in the perl-installer directory.
+Instructions coming soon.
