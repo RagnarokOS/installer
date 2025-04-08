@@ -1,4 +1,4 @@
-# $Ragnarok: Makefile,v 1.1 2025/04/07 23:23:01 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.2 2025/04/08 16:01:49 lecorbeau Exp $
 # Install the Ragnarok system. Work In Progress.
 
 include config.mk
@@ -9,7 +9,7 @@ endif
 
 all:
 	install -d ${TARGET}
-	scripts/gettarball ${STAGE3}
+	scripts/download ${STAGE3}
 
 dev:
 ifeq (${DEVICE},none)
@@ -28,4 +28,5 @@ else
 		-e "s|@HOMEPART@|${HOMEPART}|g" \
 		-e "s|@HOMESIZE@|${HOMESIZE}|g" \
 		scripts/mkdev
+	@scripts/mkdev
 endif
