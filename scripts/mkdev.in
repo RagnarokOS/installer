@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Ragnarok$
+# $Ragnarok: mkdev.in,v 1.1 2025/04/08 16:09:29 lecorbeau Exp $
 # Create partition table and mount device. DO NOT EDIT THIS SCRIPT MANUALLY.
 # This script is copied to mkdev, with variables properly set by 'make'. It
 # can be saved for later use on the same device.
