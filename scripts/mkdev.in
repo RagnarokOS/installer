@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# $Ragnarok$
+# Create partition table and mount device. DO NOT EDIT THIS SCRIPT MANUALLY.
+# This script is copied to mkdev, with variables properly set by 'make'. It
+# can be saved for later use on the same device.
+
+set -e
+
+PATH="/bin:/usr/bin"
+
+_target="@DEVICE@"
+_device="@DEVICE@"
+_bootmode="@BOOTMODE@"
+_bootpart="@BOOTPART@"
+_bootsize="@BOOTSIZE@"
+_swappart="@SWAPPART@"
+_swapsize="@SWAPSIZE@"
+_rootpart="@ROOTPART@"
+_rootsize="@ROOTSIZE@"
+_homepart="@HOMEPART@"
+_homesize="@HOMESIZE@"
+
+# Wipe device.
+sfdisk --delete "$_target" || true
+
+# Set the proper part table (mbr for 'pc', GPT for 'efi-64'.
+case "$_bootmode" in
+	efi-64)	(echo g) | fdisk "$_device"
+		_bootparttype="U"
+		;;
+	pc)	(echo o) | fdisk "$_device"
+		_bootparttype="L"
+		;;
+esac
+
+# HOMESIZE may be left empty to use all remaining space.
+if [[ -z "$_homesize" ]]; then
+	_hs="+"
+else
+	_hs="$_homesize"
+fi
+
+# Create the partition table.
+printf '%s\n' "start=2048, size=${_bootsize}, type=${_bootparttype}
+size=${_swapsize}, type=S
+size=${_rootsize}, type=L
+size=${_hs}, type=L" | sfdisk "${_device}"
+
+# Set bootable flag on partition 1.
+case "$_bootmode" in
+	efi-64)	sfdisk --part-type "$_device" 1 U
+		;;
+	pc)	sfdisk -A "$_device" 1
+		;;
+esac
+
+# Create the file systems.
+case "$_bootmode" in
+	efi-64)	mkfs.vfat -F 32 "${_device}1"
+		;;
+	pc)	mkfs.ext4 -F "${_device}1"
+		;;
+esac
+mkswap "${_device}2"
+mkfs.ext4 -F "${_device}3"
+mkfs.ext4 -F "${_device}4"
+
+# Mount the file systems.
+swapon "${_device}2"
+mount -t ext4 -o errors=remount-ro "${_device}3" "${_target}"
+mkdir -p "${_target}/home"
+mount -t ext4 -o defaults "${_device}4" "${_target}/home"
+case "$_bootmode" in
+	efi-64)	mkdir -p "${_target}/boot/efi"
+		mount -t vfat -o umask=0077,noexec,nosuid,nodev "${_device}1" "${_target}/boot/efi"
+		;;
+	pc)	mkdir -p "${_target}/boot"
+		mount -t ext4 -0 noexec,nosuid,nodev "${_device}1" "${_target}1"
+		;;
+esac
