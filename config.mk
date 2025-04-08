@@ -1,4 +1,4 @@
-# $Ragnarok: config.mk,v 1.2 2025/04/07 16:59:05 lecorbeau Exp $
+# $Ragnarok: config.mk,v 1.3 2025/04/08 16:26:28 lecorbeau Exp $
 # Config file for a Ragnarok install. Adjust to fit your system.
 
 ## Ragnarok version.
@@ -10,29 +10,10 @@ STAGE3		= base${VERSION}.tgz
 ## Where should the system be installed. Default: /mnt/ragnarok.
 TARGET		= /mnt/ragnarok
 
-## Disk Configuration
-
-# Which disk should the system be installed on, eg. /dev/sda.
-DEVICE		=
-
-# Can be either 'efi-64' for efi boot, or 'pc' for legacy bios.
-BOOTMODE	=
-
-# Boot partition and its size
-BOOTPART	=
-BOOTSIZE	=
-
-# Swap partition and its size
-SWAPPART	=
-SWAPSIZE	=
-
-# Root partition and its size
-ROOTPART	=
-ROOTSIZE	=
-
-# home partition and its size
-HOMEPART	=
-HOMESIZE	=
+## By default, Ragnarok uses separate /boot, swap, / and /home partitions.
+## If you wish to create your own partitioning scheme (or use disk encryption),
+## then comment out the line below.
+MAKE_DEV	= yes
 
 ## System Config
 HOSTNAME	=

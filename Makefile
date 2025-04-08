@@ -1,8 +1,11 @@
-# $Ragnarok: Makefile,v 1.2 2025/04/08 16:01:49 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.3 2025/04/08 16:26:26 lecorbeau Exp $
 # Install the Ragnarok system. Work In Progress.
 
 include config.mk
 
+ifdef MAKE_DEV
+	include dev.mk
+endif
 ifndef DEVICE
 	DEVICE = none
 endif
