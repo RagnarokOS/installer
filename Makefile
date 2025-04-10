@@ -1,4 +1,4 @@
-# $Ragnarok: Makefile,v 1.3 2025/04/08 16:26:26 lecorbeau Exp $
+# $Ragnarok: Makefile,v 1.5 2025/04/10 19:58:31 lecorbeau Exp $
 # Install the Ragnarok system. Work In Progress.
 
 include config.mk
@@ -13,6 +13,7 @@ endif
 all:
 	install -d ${TARGET}
 	scripts/download ${STAGE3}
+	scripts/verify-sig ${SIGKEY} ${STAGE3}
 
 dev:
 ifeq (${DEVICE},none)

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# $Ragnarok: verify-sig,v 1.1 2025/04/10 19:55:55 lecorbeau Exp $
+# Verify signature with signify
+
+_sigkey=$1
+_file=$2
+
+if ! /usr/bin/signify -C -p "${_sigkey}" -x SHA256.sig "${_file}"; then
+	printf '%s\n' "Bad signature, exiting..."
+	printf '%s\n' "You should retry the download, and if the problem persists,
+report the issue at https://github.com/RagnarokOS/distrib/issues"
+	exit 1
+fi

@@ -1,4 +1,4 @@
-# $Ragnarok: config.mk,v 1.3 2025/04/08 16:26:28 lecorbeau Exp $
+# $Ragnarok: config.mk,v 1.4 2025/04/10 19:58:33 lecorbeau Exp $
 # Config file for a Ragnarok install. Adjust to fit your system.
 
 ## Ragnarok version.
@@ -6,6 +6,9 @@ VERSION		= 02
 
 ## The stage 3 tarball to use.
 STAGE3		= base${VERSION}.tgz
+
+## The sig key to use with signify (to verify file integrity).
+SIGKEY		= /etc/signify/ragnarok${VERSION}.pub
 
 ## Where should the system be installed. Default: /mnt/ragnarok.
 TARGET		= /mnt/ragnarok
