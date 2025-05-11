@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# $Ragnarok: ragnarok-install,v 1.1 2025/05/11 16:00:43 lecorbeau Exp $
+# $Ragnarok: ragnarok-install,v 1.2 2025/05/11 16:07:51 lecorbeau Exp $
 # Experimental Perl version of the installer. It goes without saying that
 # this is a work in progress.
 
@@ -26,7 +26,7 @@ my $conf = Config::General->new(
 # them.
 my %config	= $conf->getall;
 my $version	= $config{'VERSION'};
-my $stage3	= $config{'STAGE3'};
+my $archive	= $config{'ARCHIVE'};
 my $sigkey	= $config{'SIGKEY'};
 my $target	= $config{'TARGET'};
 
