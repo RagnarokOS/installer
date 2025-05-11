@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+# $Ragnarok: ragnarok-install,v 1.1 2025/05/11 16:00:43 lecorbeau Exp $
+# Experimental Perl version of the installer. It goes without saying that
+# this is a work in progress.
+
+use strict;
+use warnings;
+use Config::General;
+use Cwd qw();
+
+# install.conf can either be in the current work dir (ie. $pwd), or in /
+my $workdir	= Cwd::cwd();
+my @confpath	= qw($workdir /);
+
+# Config params
+my $conf = Config::General->new(
+	-ConfigPath		=> \@confpath,
+	-ConfigFile		=> 'install.conf',
+	-SplitPolicy		=> 'equalsign',
+	-InterPolateVars	=> 1
+);
+
+# Global variable. Only declare config opts that are needed by multiple
+# subroutines. Everything else should be declared in the subs that need
+# them.
+my %config	= $conf->getall;
+my $version	= $config{'VERSION'};
+my $stage3	= $config{'STAGE3'};
+my $sigkey	= $config{'SIGKEY'};
+my $target	= $config{'TARGET'};
+
+## Subroutines
+
+# Handle errors
+sub error {
+	my $err = shift;
+	$err	= "Error: $err";
+
+	die("$err\n");
+}
+
+# Print message (just makes the code more readable, again).
+sub msg {
+	my $msg = shift;
+	print("$msg\n");
+}
+
+# Ask a question. NOTE This is going to be useful down the line.
+sub ask {
+	my ($question)	= @_;
+	local $!	= 1;
+
+	print("$question\n");
+	chomp(my $answer = <STDIN>);
+
+	return $answer;
+}
+
+# Finishing up.
+sub finish {
+	print("Installation complete. Type 'r' to reboot to the new system, or 'e' to exit the installer and stay in the live session: ");
+	chomp(my $choice = <STDIN>);
+
+	for ($choice) {
+		if($choice eq 'e') {
+			print("rebooting in 5 seconds...\n");
+			sleep(5);
+			system("/usr/bin/loginctl", "reboot") == 0
+				or error("Can't reboot, $!\n");
+		}
+		if ($choice eq 'r') {
+			print("Exiting installer...\n");
+			exit(0);
+		}
+		else {
+			print("Wrong answer. Type 'r' to reboot, or 'e' to exit installer... ");
+			goto &finish;
+		}
+	}
+	return $choice;
+}
+
+## Actual installer
